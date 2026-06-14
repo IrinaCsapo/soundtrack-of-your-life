@@ -4,28 +4,34 @@ import {
   MUSIC_INPUT_DEFAULTS,
   getLatestMusicVersion,
 } from '@/lib/replicate';
-import { buildMusicPrompt } from '@/lib/musicPrompt';
+import { generateSoundtrackMetadata } from '@/lib/claude';
 
 // Vercel: allow up to 30s for the prediction-creation call. The actual
-// generation happens on Replicate's side and is polled by the reveal page.
+// music generation happens on Replicate's side and is polled by the reveal page.
 export const maxDuration = 30;
 
 /**
  * POST /api/generate
  *
- * Takes the 5 answers, builds a music prompt, looks up the latest version
- * of the music model on Replicate, kicks off a prediction, and returns the
- * prediction ID (used as the soundtrack slug for now).
+ * 1. Takes the 6 answers (5 memory + 1 genre).
+ * 2. Calls Claude to produce a music prompt + three candidate titles.
+ * 3. Looks up the latest version of MusicGen on Replicate.
+ * 4. Kicks off a Replicate prediction with the music prompt.
+ * 5. Returns the prediction ID + titles to the client.
  *
- * The reveal page polls /api/soundtrack/[id]/status until the audio is ready.
+ * The reveal page polls /api/soundtrack/[id]/status until the audio is ready,
+ * and uses /api/titles to shuffle for fresh titles when asked.
  */
 export async function POST(request: Request) {
   if (!process.env.REPLICATE_API_TOKEN) {
     return NextResponse.json(
-      {
-        error:
-          'REPLICATE_API_TOKEN is not set. Add it to your Vercel project environment variables.',
-      },
+      { error: 'REPLICATE_API_TOKEN is not set in Vercel env vars.' },
+      { status: 500 }
+    );
+  }
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json(
+      { error: 'ANTHROPIC_API_KEY is not set in Vercel env vars.' },
       { status: 500 }
     );
   }
@@ -46,17 +52,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'missing answers' }, { status: 400 });
   }
 
-  const prompt = buildMusicPrompt(answers);
-  console.log('[generate] prompt:', prompt);
-
   try {
-    const versionId = await getLatestMusicVersion();
-    console.log('[generate] using version:', versionId);
+    // 1. Claude → music prompt + three candidate titles
+    const { musicPrompt, titles } = await generateSoundtrackMetadata(answers);
+    console.log('[generate] prompt:', musicPrompt);
+    console.log('[generate] titles:', titles);
 
+    // 2. Replicate → start music generation
+    const versionId = await getLatestMusicVersion();
     const prediction = await replicate.predictions.create({
       version: versionId,
       input: {
-        prompt,
+        prompt: musicPrompt,
         ...MUSIC_INPUT_DEFAULTS,
       },
     });
@@ -65,11 +72,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       slug: prediction.id,
-      prompt,
+      prompt: musicPrompt,
+      titles,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'unknown error';
-    console.error('[generate] replicate error:', err);
+    console.error('[generate] error:', err);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

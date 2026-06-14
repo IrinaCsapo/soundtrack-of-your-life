@@ -28,7 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable}`}>
-      <body className="bg-ink text-paper font-serif antialiased min-h-screen">
+      <body
+        className="bg-ink text-paper font-serif antialiased min-h-screen"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

@@ -1,9 +1,25 @@
+export type QuestionType = 'text' | 'genre';
+
 export type Question = {
   id: string;
   text: string;
   placeholder: string;
   skippable: boolean;
+  type?: QuestionType; // defaults to 'text'
+  options?: string[]; // for genre-type questions: the preset chip choices
 };
+
+/** The curated genre chip list for Q6. Tune freely. */
+export const GENRE_OPTIONS = [
+  'lo-fi',
+  'ambient',
+  'shoegaze',
+  'jazz',
+  '80s synth',
+  'classical',
+  'folk',
+  'rock',
+];
 
 export const questions: Question[] = [
   {
@@ -38,5 +54,13 @@ export const questions: Question[] = [
     text: 'What does this memory want to whisper to you?',
     placeholder: 'one line. it can be honest. nothing has to rhyme.',
     skippable: true,
+  },
+  {
+    id: 'q6',
+    text: 'What does this feeling sound like?',
+    placeholder: 'bossa nova, dream pop, gregorian chant, distorted lullaby…',
+    skippable: true,
+    type: 'genre',
+    options: GENRE_OPTIONS,
   },
 ];

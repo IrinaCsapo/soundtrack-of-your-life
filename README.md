@@ -1,33 +1,40 @@
 # Soundtrack of Your Life
 
-A small tool in Irina's Cabinet of Delights — five questions about a moment become a custom lo-fi/ambient track.
+A small tool in Irina's Cabinet of Delights — answer six questions about a moment, get a custom lo-fi/ambient track with a poetic title.
 
-This is the **v0.2 scaffold**: the music actually generates now.
+This is the **v0.3 scaffold**: real music generation, smart Claude-translated prompts, three candidate titles per soundtrack with shuffle, and a genre selector with curated chips + custom input.
 
 ---
 
 ## What works right now
 
-- **Landing page** at `/` — quiet invitation and a "begin" link
-- **5-question flow** at `/questions` — full-screen, one at a time, soft fade transitions, keyboard-friendly, Q4 + Q5 skippable
-- **Real music generation** via Replicate (MusicGen stereo-large by default)
-- **Reveal page** at `/soundtrack/[id]` — polls the generation status, shows a "held breath" while waiting, then a soft audio player with the user's answers as a poem when ready, plus an MP3 download
+- **Landing page** at `/`
+- **Six-question flow** at `/questions` — five memory questions + one genre question (chips + custom). All except Q1–Q3 are skippable.
+- **Smart prompt translation** via Claude Haiku — each set of answers gets a custom-tailored MusicGen prompt with genre, instruments, mood, tempo, texture.
+- **Three candidate titles** generated alongside the music prompt, displayed on the reveal page for the user to pick.
+- **Shuffle** — user can request three fresh titles via `/api/titles` if none of the originals fit.
+- **Music generation** via Replicate (MusicGen stereo-large), with a status-polling reveal page.
+- **Audio player** with brass progress ring + breathing animation when playing.
+- **Copy link, download MP3, make another** actions.
 
 ## First-time setup
 
-You need Node 18+ and a Replicate API token.
+You need Node 18+, a Replicate API token, and an Anthropic API key.
 
 ```bash
 npm install
 ```
 
-Then create a file called `.env.local` in the project root and put your Replicate token in it:
+Create `.env.local` in the project root:
 
 ```
 REPLICATE_API_TOKEN=r8_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-Get a token from [replicate.com/account/api-tokens](https://replicate.com/account/api-tokens). Don't commit this file — it's in `.gitignore`.
+Get tokens from:
+- Replicate: [replicate.com/account/api-tokens](https://replicate.com/account/api-tokens)
+- Anthropic: [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys)
 
 Then:
 
@@ -35,16 +42,22 @@ Then:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), walk the flow. The final step kicks off a real Replicate generation (~30s for a 30-second clip, ~$0.02 per generation).
+## Cost per generation (~30s clip)
+
+- Replicate (MusicGen stereo-large): ~$0.02
+- Anthropic (Claude Haiku, ~600 tokens in + 200 tokens out for prompt + titles): ~$0.0002
+- Anthropic (Claude Haiku, shuffle titles only): ~$0.0001 per shuffle
+- **Total per soundtrack**: ~$0.02
 
 ## How the generation flow works
 
-1. User submits answers → `POST /api/generate`
-2. The route translates the answers into a music prompt (see `lib/musicPrompt.ts`), kicks off a Replicate prediction, returns the prediction ID
-3. Browser redirects to `/soundtrack/[prediction-id]` and polls `GET /api/soundtrack/[id]/status` every 2 seconds
-4. When the prediction succeeds, the page fades in the audio player + download link
-
-The answers are temporarily stashed in `sessionStorage` so the reveal page can render them as a soft poem. When we wire up Supabase, this moves to the database and the URLs become real shareable links.
+1. User submits the six answers → `POST /api/generate`
+2. Claude Haiku produces `{ musicPrompt, titles[3] }` from the answers + genre
+3. The route fetches the current latest version of `meta/musicgen` on Replicate
+4. Kicks off a Replicate prediction with the music prompt; returns prediction ID + the three titles
+5. Browser stashes the answers + titles in `sessionStorage`, redirects to `/soundtrack/[prediction-id]`
+6. Reveal page polls `GET /api/soundtrack/[id]/status` every 2 seconds, shows title candidates immediately, displays the audio player when ready
+7. Shuffle button calls `POST /api/titles` for three fresh candidates
 
 ## Project shape
 
@@ -53,34 +66,31 @@ app/
   layout.tsx                          root layout, fonts, warm dark theme
   page.tsx                            landing
   globals.css                         tailwind + theme variables
-  questions/page.tsx                  the 5-question flow
-  soundtrack/[slug]/page.tsx          reveal page (polls status, plays audio)
+  questions/page.tsx                  the 6-question flow + GenreSelector
+  soundtrack/[slug]/page.tsx          reveal page (titles + status + player)
   api/
-    generate/route.ts                 starts a Replicate prediction
-    soundtrack/[id]/status/route.ts   returns current prediction status
+    generate/route.ts                 Claude → prompt + titles, kicks off Replicate
+    titles/route.ts                   Shuffle: three fresh titles
+    soundtrack/[id]/status/route.ts   Returns current prediction status
 lib/
-  questions.ts                        the 5 questions, edit freely
-  musicPrompt.ts                      template-based prompt translation
-  replicate.ts                        Replicate client + model defaults
+  questions.ts                        the six questions + genre options
+  claude.ts                           Anthropic client + prompt/title generation
+  replicate.ts                        Replicate client + model version resolution
+  musicPrompt.ts                      legacy template fallback (no longer used)
 ```
 
 ## What's next, in order
 
-1. **Swap the prompt translator for Claude Haiku** — current version is a hand-crafted template, an LLM call would produce much richer prompts
-2. **Title generator** — Claude Haiku returns 3 candidate titles per soundtrack, user picks
-3. **Supabase** — persist soundtracks (answers, prompt, audio URL, title) so reveal pages are shareable across browsers
-4. **SoundCloud OAuth + opt-in publish** — one-time auth, opt-in toggle on the reveal page
-5. **OG image rendering** with `@vercel/og` for link unfurls
-6. **Client-side MP4 generation** (Web Audio API + Canvas + MediaRecorder) for socials
+1. **Subdomain** — finish wiring `soundtrack.irina.love` at Vercel + GoDaddy
+2. **Supabase persistence** — soundtracks stored server-side, real shareable URLs
+3. **SoundCloud OAuth + opt-in publish** — single Cabinet account, AI-flagged uploads
+4. **OG image rendering** for link unfurls
+5. **Client-side MP4 generation** for social shares
 
 ## Theme
 
-The aesthetic lives in `app/globals.css` as five CSS variables — `--ink`, `--warmth`, `--paper`, `--whisper`, `--brass`. Tune freely. Fonts are Crimson Pro (serif) and Inter (sans), loaded via `next/font/google`.
-
-## Swapping the music model
-
-Edit `lib/replicate.ts`. The default is `meta/musicgen` with `model_version: 'stereo-large'`. To try Stable Audio instead, change `MUSIC_MODEL` to `'stackadoc/stable-audio-open-1.0'` and adjust the input keys — Stable Audio uses `seconds_total` instead of `duration`.
+CSS variables in `app/globals.css`. Five colors, tune to taste.
 
 ## Deploy
 
-When ready: push to GitHub via GitHub Desktop, then import into Vercel (free Hobby tier). Add `REPLICATE_API_TOKEN` in Vercel's project settings → Environment Variables. Point a domain at the deployment.
+Push to GitHub via GitHub Desktop → Vercel auto-deploys. Add both `REPLICATE_API_TOKEN` and `ANTHROPIC_API_KEY` in Vercel's Environment Variables UI.

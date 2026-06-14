@@ -18,11 +18,13 @@ export default function QuestionsPage() {
   const canAdvance =
     currentAnswer.trim().length > 0 || currentQuestion.skippable;
 
-  // Auto-focus the textarea every time we change step
+  // Auto-focus the textarea every time we change step (only for text questions)
   useEffect(() => {
-    const t = setTimeout(() => textareaRef.current?.focus(), 50);
-    return () => clearTimeout(t);
-  }, [step]);
+    if (currentQuestion.type !== 'genre') {
+      const t = setTimeout(() => textareaRef.current?.focus(), 50);
+      return () => clearTimeout(t);
+    }
+  }, [step, currentQuestion.type]);
 
   function update(value: string) {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
@@ -50,15 +52,19 @@ export default function QuestionsPage() {
         body: JSON.stringify({ answers }),
       });
       if (!res.ok) {
-        const { error } = await res.json().catch(() => ({ error: 'generation request failed' }));
+        const { error } = await res
+          .json()
+          .catch(() => ({ error: 'generation request failed' }));
         throw new Error(error || 'generation request failed');
       }
-      const { slug } = await res.json();
+      const { slug, titles } = await res.json();
 
-      // Stash the answers so the reveal page can render them as a soft poem.
-      // Lives in sessionStorage until we wire up Supabase.
+      // Stash answers + titles for the reveal page.
       try {
         sessionStorage.setItem(`answers:${slug}`, JSON.stringify(answers));
+        if (Array.isArray(titles)) {
+          sessionStorage.setItem(`titles:${slug}`, JSON.stringify(titles));
+        }
       } catch {
         /* private mode etc — non-fatal */
       }
@@ -72,7 +78,6 @@ export default function QuestionsPage() {
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    // Enter (no shift) advances; shift+enter inserts a newline
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (canAdvance) next();
@@ -89,21 +94,31 @@ export default function QuestionsPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-6"
+            className="space-y-8"
           >
             <h1 className="font-serif text-2xl md:text-3xl text-paper leading-snug">
               {currentQuestion.text}
             </h1>
-            <textarea
-              ref={textareaRef}
-              className="poetry-input"
-              placeholder={currentQuestion.placeholder}
-              value={currentAnswer}
-              onChange={(e) => update(e.target.value)}
-              onKeyDown={onKeyDown}
-              rows={3}
-              aria-label={currentQuestion.text}
-            />
+
+            {currentQuestion.type === 'genre' ? (
+              <GenreSelector
+                value={currentAnswer}
+                onChange={update}
+                options={currentQuestion.options ?? []}
+                placeholder={currentQuestion.placeholder}
+              />
+            ) : (
+              <textarea
+                ref={textareaRef}
+                className="poetry-input"
+                placeholder={currentQuestion.placeholder}
+                value={currentAnswer}
+                onChange={(e) => update(e.target.value)}
+                onKeyDown={onKeyDown}
+                rows={3}
+                aria-label={currentQuestion.text}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
 
@@ -117,7 +132,10 @@ export default function QuestionsPage() {
             back
           </button>
 
-          <div className="flex gap-2" aria-label={`step ${step + 1} of ${questions.length}`}>
+          <div
+            className="flex gap-2"
+            aria-label={`step ${step + 1} of ${questions.length}`}
+          >
             {questions.map((_, i) => (
               <span
                 key={i}
@@ -145,5 +163,77 @@ export default function QuestionsPage() {
         )}
       </div>
     </main>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// GenreSelector — chips + an "or write your own" field
+// ---------------------------------------------------------------------------
+
+function GenreSelector({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder: string;
+}) {
+  const isCustom = value.length > 0 && !options.includes(value);
+  const [customText, setCustomText] = useState(isCustom ? value : '');
+
+  // Keep the custom field in sync if the value changes externally
+  useEffect(() => {
+    if (isCustom) setCustomText(value);
+  }, [isCustom, value]);
+
+  function pickChip(opt: string) {
+    onChange(opt);
+    setCustomText('');
+  }
+
+  function typeCustom(text: string) {
+    setCustomText(text);
+    onChange(text);
+  }
+
+  return (
+    <div className="space-y-8 pt-2">
+      <div className="flex flex-wrap gap-2 justify-center">
+        {options.map((opt) => {
+          const selected = value === opt && !isCustom;
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => pickChip(opt)}
+              className={`px-4 py-2 rounded-full border text-sm font-serif italic transition-colors duration-300 ${
+                selected
+                  ? 'border-brass text-brass bg-brass/5'
+                  : 'border-whisper/30 text-whisper hover:border-whisper hover:text-paper'
+              }`}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col items-center gap-3 pt-2">
+        <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-whisper/60">
+          or write your own
+        </p>
+        <input
+          type="text"
+          value={customText}
+          onChange={(e) => typeCustom(e.target.value)}
+          placeholder={placeholder}
+          aria-label="custom genre"
+          className="w-full max-w-sm text-center bg-transparent border-b border-whisper/30 focus:border-brass text-paper font-serif italic placeholder:text-whisper/50 placeholder:italic py-2 outline-none transition-colors duration-300"
+        />
+      </div>
+    </div>
   );
 }
