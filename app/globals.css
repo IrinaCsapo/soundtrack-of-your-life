@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* warm dark theme — tune to taste */
+  --ink: #0E0D11;       /* warm near-black */
+  --warmth: #1A1719;    /* one shade up */
+  --paper: #ECE7DC;     /* warm cream */
+  --whisper: #756E61;   /* muted brass */
+  --brass: #C9B79C;     /* gentle accent for focus + hover */
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-feature-settings: "ss01", "ss02";
+}
+
+/* Soft focus rings everywhere */
+*:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* The textarea look used in the question screens */
+.poetry-input {
+  background: transparent;
+  border: none;
+  color: var(--paper);
+  font-family: var(--font-serif), serif;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  resize: none;
+  width: 100%;
+  min-height: 8rem;
+}
+
+.poetry-input::placeholder {
+  color: var(--whisper);
+  font-style: italic;
+}
+
+/* Disable the default textarea focus ring (we use *:focus-visible above) */
+.poetry-input:focus {
+  outline: none;
+}
