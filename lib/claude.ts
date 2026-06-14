@@ -50,13 +50,11 @@ export type SoundtrackMetadata = {
 function formatUserPrompt(answers: Answers): string {
   return [
     'The user answered these questions about a memory:',
-    `Q1 — where they are: ${answers.q1 || '(skipped)'}`,
-    `Q2 — time / light: ${answers.q2 || '(skipped)'}`,
-    `Q3 — a sensory detail: ${answers.q3 || '(skipped)'}`,
-    `Q4 — if it had weather: ${answers.q4 || '(skipped)'}`,
-    `Q5 — what it whispers: ${answers.q5 || '(skipped)'}`,
-    answers.q6
-      ? `Genre they want: ${answers.q6}`
+    `Q1 — where and when: ${answers.q1 || '(skipped)'}`,
+    `Q2 — what they hear, touch, or notice: ${answers.q2 || '(skipped)'}`,
+    `Q3 — what the moment whispers: ${answers.q3 || '(skipped)'}`,
+    answers.q4
+      ? `Genre they want: ${answers.q4}`
       : 'Genre: not specified (use lo-fi ambient default)',
   ].join('\n');
 }
