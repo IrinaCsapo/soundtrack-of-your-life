@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
-import { replicate, MUSIC_MODEL, MUSIC_INPUT_DEFAULTS } from '@/lib/replicate';
+import {
+  replicate,
+  MUSIC_INPUT_DEFAULTS,
+  getLatestMusicVersion,
+} from '@/lib/replicate';
 import { buildMusicPrompt } from '@/lib/musicPrompt';
 
 // Vercel: allow up to 30s for the prediction-creation call. The actual
@@ -9,8 +13,9 @@ export const maxDuration = 30;
 /**
  * POST /api/generate
  *
- * Takes the 5 answers, builds a music prompt, kicks off a Replicate prediction,
- * and returns the prediction ID (used as the soundtrack slug for now).
+ * Takes the 5 answers, builds a music prompt, looks up the latest version
+ * of the music model on Replicate, kicks off a prediction, and returns the
+ * prediction ID (used as the soundtrack slug for now).
  *
  * The reveal page polls /api/soundtrack/[id]/status until the audio is ready.
  */
@@ -19,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          'REPLICATE_API_TOKEN is not set. Add it to your .env.local file and restart `npm run dev`.',
+          'REPLICATE_API_TOKEN is not set. Add it to your Vercel project environment variables.',
       },
       { status: 500 }
     );
@@ -45,8 +50,11 @@ export async function POST(request: Request) {
   console.log('[generate] prompt:', prompt);
 
   try {
+    const versionId = await getLatestMusicVersion();
+    console.log('[generate] using version:', versionId);
+
     const prediction = await replicate.predictions.create({
-      model: MUSIC_MODEL,
+      version: versionId,
       input: {
         prompt,
         ...MUSIC_INPUT_DEFAULTS,
