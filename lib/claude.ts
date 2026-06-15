@@ -4,11 +4,11 @@ export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-/** Claude Haiku — cheap, fast, sufficient for poem + prompt work. */
+/** Claude Haiku — cheap, fast, sufficient for prompt + poem work. */
 export const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 
 const TITLE_VOICE_EXAMPLES = `
-Examples of titles in the voice we want (lowercase, 1–4 words, soft, evocative, not clever):
+Examples of titles in the voice we want (lowercase, 1–4 words, soft, evocative):
   "honey at four"
   "the kettle, far off"
   "you didn't know yet"
@@ -19,17 +19,20 @@ Examples of titles in the voice we want (lowercase, 1–4 words, soft, evocative
   "before anyone called"
 `;
 
-const METADATA_SYSTEM_PROMPT = `You translate a user's memory into two things:
-1. A music generation prompt to send to MusicGen (Meta's text-to-music model). It should describe the music — genre, instruments, mood, tempo, texture — in a way that sounds like the memory feels. Avoid abstract poetry; MusicGen responds to concrete sonic vocabulary.
-2. Three poetic candidate titles for the resulting soundtrack — distinct from each other in mood or angle.
+const METADATA_SYSTEM_PROMPT = `You translate a user's memory into THREE things:
+
+1. A MUSIC generation prompt for MusicGen (Meta's text-to-music model). Describe genre, instruments, mood, tempo, texture. The music should sound like the memory feels. Concrete sonic vocabulary, not abstract poetry. If the user specifies a genre, make it the frame; if not, default to lo-fi ambient.
+
+2. A VISUAL generation prompt for Flux (text-to-image model) for the soundtrack's square (1:1) album cover. PHOTOGRAPHIC / CINEMATIC style — like a film still of the memory. NOT literal or generic. Specify camera vocabulary (35mm film grain, shallow depth of field, golden hour, golden glass light, etc.), composition (album-cover-worthy framing, figures in middle distance, no faces), and mood. Atmospheric, intimate, painterly light. Photograph quality, not illustration.
+
+3. Three poetic CANDIDATE TITLES for the soundtrack — distinct from each other in mood or angle.
 
 ${TITLE_VOICE_EXAMPLES}
-
-If the user specifies a genre, weave it into the music prompt as the central frame. If they don't, default to lo-fi ambient instrumental.
 
 Always return valid JSON, no markdown fences, with exactly this shape:
 {
   "musicPrompt": "...",
+  "visualPrompt": "...",
   "titles": ["...", "...", "..."]
 }`;
 
@@ -44,6 +47,7 @@ export type Answers = Record<string, string>;
 
 export type SoundtrackMetadata = {
   musicPrompt: string;
+  visualPrompt: string;
   titles: string[];
 };
 
@@ -61,31 +65,23 @@ function formatUserPrompt(answers: Answers): string {
 
 function extractFirstJSON<T = unknown>(text: string): T {
   const trimmed = text.trim();
-
-  // Try a fenced code block first
   const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  if (fenced) {
-    return JSON.parse(fenced[1]) as T;
-  }
-
-  // Otherwise the first {...} or [...]
+  if (fenced) return JSON.parse(fenced[1]) as T;
   const firstBracket = trimmed.search(/[{[]/);
-  if (firstBracket === -1) {
-    throw new Error('No JSON found in Claude response');
-  }
+  if (firstBracket === -1) throw new Error('No JSON found in Claude response');
   return JSON.parse(trimmed.slice(firstBracket)) as T;
 }
 
 /**
- * One Claude call: returns the music prompt and three candidate titles.
- * Called from /api/generate when the user submits the question flow.
+ * One Claude call: returns the music prompt, the visual prompt, and three
+ * candidate titles. Called from /api/generate.
  */
 export async function generateSoundtrackMetadata(
   answers: Answers
 ): Promise<SoundtrackMetadata> {
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 800,
+    max_tokens: 1000,
     temperature: 0.9,
     system: METADATA_SYSTEM_PROMPT,
     messages: [{ role: 'user', content: formatUserPrompt(answers) }],
@@ -100,6 +96,7 @@ export async function generateSoundtrackMetadata(
 
   if (
     typeof parsed.musicPrompt !== 'string' ||
+    typeof parsed.visualPrompt !== 'string' ||
     !Array.isArray(parsed.titles) ||
     parsed.titles.length === 0
   ) {
@@ -108,19 +105,17 @@ export async function generateSoundtrackMetadata(
 
   return {
     musicPrompt: parsed.musicPrompt,
+    visualPrompt: parsed.visualPrompt,
     titles: parsed.titles.slice(0, 3),
   };
 }
 
-/**
- * Generate three fresh candidate titles for a memory — used by the
- * "shuffle" button on the reveal page. Skips the music prompt to save tokens.
- */
+/** Three fresh titles for the shuffle button. */
 export async function generateTitles(answers: Answers): Promise<string[]> {
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     max_tokens: 200,
-    temperature: 1.0, // higher temp = more variety on shuffle
+    temperature: 1.0,
     system: TITLES_SYSTEM_PROMPT,
     messages: [
       {

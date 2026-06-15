@@ -57,17 +57,10 @@ export default function QuestionsPage() {
           .catch(() => ({ error: 'generation request failed' }));
         throw new Error(error || 'generation request failed');
       }
-      const { slug, titles } = await res.json();
+      const { slug } = await res.json();
 
-      // Stash answers + titles for the reveal page.
-      try {
-        sessionStorage.setItem(`answers:${slug}`, JSON.stringify(answers));
-        if (Array.isArray(titles)) {
-          sessionStorage.setItem(`titles:${slug}`, JSON.stringify(titles));
-        }
-      } catch {
-        /* private mode etc — non-fatal */
-      }
+      // Answers + titles are now persisted server-side (in Supabase) and
+      // returned by /api/soundtrack/[id]/status, so no sessionStorage needed.
 
       router.push(`/soundtrack/${slug}`);
     } catch (err) {

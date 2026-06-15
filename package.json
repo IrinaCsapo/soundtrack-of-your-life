@@ -1,6 +1,6 @@
 {
   "name": "soundtrack-of-your-life",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
+    "@supabase/supabase-js": "^2.45.0",
     "framer-motion": "^11.11.0",
     "next": "^15.0.3",
     "react": "^19.0.0",

@@ -8,49 +8,63 @@ export const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-/** Current music model + the defaults we send with every generation. */
+// ---------------------------------------------------------------------------
+// Music model — MusicGen stereo-large
+// ---------------------------------------------------------------------------
+
 export const MUSIC_MODEL = 'meta/musicgen';
 
 export const MUSIC_INPUT_DEFAULTS = {
   model_version: 'stereo-large' as const,
-  duration: 30,
+  duration: 60, // 60 seconds — bumped up from 30 for fuller pieces
   output_format: 'mp3' as const,
   normalization_strategy: 'loudness' as const,
 };
 
-/**
- * Fetch the latest version hash for the music model.
- *
- * Why this exists: as of mid-2026, Replicate's API for community-published
- * models requires a specific version hash rather than just `owner/name`.
- * We resolve the latest version on the fly so we don't have to hard-code
- * a hash that goes stale.
- *
- * The fetched version is cached in memory for the lifetime of the Vercel
- * function instance (small win on warm starts, no-op on cold starts).
- */
-let cachedVersionId: string | null = null;
-let cachedAt = 0;
-const VERSION_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+// ---------------------------------------------------------------------------
+// Cover model — Flux Dev for photographic/cinematic album covers
+// ---------------------------------------------------------------------------
 
-export async function getLatestMusicVersion(): Promise<string> {
+export const COVER_MODEL = 'black-forest-labs/flux-dev';
+
+export const COVER_INPUT_DEFAULTS = {
+  aspect_ratio: '1:1' as const,
+  output_format: 'png' as const,
+  num_outputs: 1,
+  num_inference_steps: 28,
+  guidance: 3.5,
+};
+
+// ---------------------------------------------------------------------------
+// Version resolution
+//
+// Replicate's API requires a specific version hash for community models.
+// We resolve the latest version dynamically with an in-memory cache.
+// ---------------------------------------------------------------------------
+
+type CacheEntry = { id: string; cachedAt: number };
+const VERSION_TTL_MS = 60 * 60 * 1000; // 1 hour
+const versionCache = new Map<string, CacheEntry>();
+
+async function getLatestVersion(modelName: string): Promise<string> {
   const now = Date.now();
-  if (cachedVersionId && now - cachedAt < VERSION_CACHE_TTL_MS) {
-    return cachedVersionId;
+  const cached = versionCache.get(modelName);
+  if (cached && now - cached.cachedAt < VERSION_TTL_MS) {
+    return cached.id;
   }
 
-  const [owner, name] = MUSIC_MODEL.split('/');
+  const [owner, name] = modelName.split('/');
   const model = await replicate.models.get(owner, name);
   const versionId = model.latest_version?.id;
-
   if (!versionId) {
     throw new Error(
-      `Could not find a latest version for ${MUSIC_MODEL} on Replicate. ` +
-        `The model may have been moved or renamed.`
+      `Could not find a latest version for ${modelName} on Replicate.`
     );
   }
 
-  cachedVersionId = versionId;
-  cachedAt = now;
+  versionCache.set(modelName, { id: versionId, cachedAt: now });
   return versionId;
 }
+
+export const getLatestMusicVersion = () => getLatestVersion(MUSIC_MODEL);
+export const getLatestCoverVersion = () => getLatestVersion(COVER_MODEL);
