@@ -74,12 +74,11 @@ export default function SoundtrackPage() {
   const [titles, setTitles] = useState<string[]>([]);
   const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<string, string> | null>(null);
-  const [isPublic, setIsPublic] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [shuffling, setShuffling] = useState(false);
-  const [sharing, setSharing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   // Poll status — single source of truth, no more sessionStorage
   useEffect(() => {
@@ -98,7 +97,6 @@ export default function SoundtrackPage() {
         if (Array.isArray(data.titles)) setTitles(data.titles);
         if (data.selectedTitle) setSelectedTitle(data.selectedTitle);
         if (data.answers) setAnswers(data.answers);
-        if (typeof data.isPublic === 'boolean') setIsPublic(data.isPublic);
         if (data.error) setError(String(data.error));
 
         // Keep polling while music or cover is still working
@@ -156,26 +154,35 @@ export default function SoundtrackPage() {
     }
   }, [answers, shuffling]);
 
-  const toggleShare = useCallback(async () => {
-    if (sharing) return;
-    const next = !isPublic;
-    setSharing(true);
-    setIsPublic(next); // optimistic
+  async function downloadAudio() {
+    if (!audioUrl || downloading) return;
+    setDownloading(true);
     try {
-      const res = await fetch(`/api/soundtrack/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isPublic: next }),
-      });
-      if (!res.ok) {
-        setIsPublic(!next); // rollback
-      }
-    } catch {
-      setIsPublic(!next);
+      const res = await fetch(audioUrl);
+      if (!res.ok) throw new Error('failed to fetch audio');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const filename = buildFilename(
+        selectedTitle || (titles[0] ?? null),
+        new Date()
+      );
+
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (err) {
+      console.error('download failed', err);
+      // Fallback: open in new tab so the user can save manually
+      window.open(audioUrl, '_blank');
     } finally {
-      setSharing(false);
+      setDownloading(false);
     }
-  }, [id, isPublic, sharing]);
+  }
 
   async function copyLink() {
     try {
@@ -317,49 +324,19 @@ export default function SoundtrackPage() {
             </motion.div>
           )}
 
-          {/* Share-to-archive toggle (only after music ready) */}
-          {musicReady && (
-            <motion.div variants={itemVariants} className="pb-10">
-              <button
-                onClick={toggleShare}
-                disabled={sharing}
-                className="inline-flex items-center gap-3 font-sans text-[11px] tracking-[0.25em] uppercase text-whisper hover:text-brass transition-colors duration-300 group"
-                aria-pressed={isPublic}
-              >
-                <span
-                  className={`w-9 h-5 rounded-full border transition-colors duration-300 relative ${
-                    isPublic
-                      ? 'border-brass bg-brass/20'
-                      : 'border-whisper/40 bg-transparent group-hover:border-whisper'
-                  }`}
-                  aria-hidden
-                >
-                  <span
-                    className={`absolute top-0.5 w-3.5 h-3.5 rounded-full transition-all duration-300 ${
-                      isPublic
-                        ? 'left-[18px] bg-brass'
-                        : 'left-0.5 bg-whisper/60 group-hover:bg-whisper'
-                    }`}
-                  />
-                </span>
-                {isPublic ? 'shared to the cabinet' : 'share to the cabinet'}
-              </button>
-            </motion.div>
-          )}
-
           {/* Actions */}
           <motion.div
             variants={itemVariants}
             className="flex items-center justify-center gap-4 font-sans text-[11px] tracking-[0.25em] uppercase"
           >
             {audioUrl ? (
-              <a
-                href={audioUrl}
-                download="soundtrack.mp3"
-                className="text-whisper hover:text-brass transition-colors duration-300"
+              <button
+                onClick={downloadAudio}
+                disabled={downloading}
+                className="text-whisper hover:text-brass transition-colors duration-300 disabled:opacity-40"
               >
-                download mp3
-              </a>
+                {downloading ? 'saving…' : 'download mp3'}
+              </button>
             ) : (
               <span className="text-whisper/30">download mp3</span>
             )}
@@ -607,4 +584,26 @@ function LoadingPulse() {
       </motion.div>
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Filename helper
+// "honey at four" → "honey-at-four_2026-06-15_21-44.mp3"
+// ---------------------------------------------------------------------------
+
+function buildFilename(title: string | null, date: Date): string {
+  const safeTitle = (title || 'untitled')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) || 'untitled';
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mi = String(date.getMinutes()).padStart(2, '0');
+
+  return `${safeTitle}_${yyyy}-${mm}-${dd}_${hh}-${mi}.mp3`;
 }

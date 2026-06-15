@@ -9,16 +9,21 @@ export type Question = {
   options?: string[]; // for genre-type questions: the preset chip choices
 };
 
-/** The curated genre chip list for Q4. Tune freely. */
+/**
+ * The curated genre chip list for Q4. Tune freely.
+ *
+ * Each chip is a vibe / a mood / a moment, not a category. People should
+ * be able to recognize the feeling, not the genre.
+ */
 export const GENRE_OPTIONS = [
-  'lo-fi',
-  'ambient',
-  'shoegaze',
-  'jazz',
-  '80s synth',
-  'classical',
-  'folk',
-  'rock',
+  'distorted lullaby',
+  'dreamy shoegaze',
+  'psychedelic chillwave',
+  'haunted piano',
+  'velvet ambient',
+  'midnight jazz',
+  'forgotten radio',
+  'crystalline drone',
 ];
 
 export const questions: Question[] = [

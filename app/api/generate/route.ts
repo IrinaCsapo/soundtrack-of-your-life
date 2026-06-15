@@ -91,7 +91,10 @@ export async function POST(request: Request) {
     console.log('[generate] music prediction:', musicPrediction.id);
     console.log('[generate] cover prediction:', coverPrediction.id);
 
-    // 4. Persist soundtrack record (music prediction ID is the slug)
+    // 4. Persist soundtrack record (music prediction ID is the slug).
+    //    Default to public — soundtracks join the Cabinet automatically.
+    //    We never collect identifying info, so this is safe by design.
+    const now = new Date().toISOString();
     const { error: insertError } = await supabaseAdmin
       .from('soundtracks')
       .insert({
@@ -104,6 +107,8 @@ export async function POST(request: Request) {
         cover_replicate_id: coverPrediction.id,
         music_status: 'starting',
         cover_status: 'starting',
+        is_public: true,
+        shared_at: now,
       });
 
     if (insertError) {
