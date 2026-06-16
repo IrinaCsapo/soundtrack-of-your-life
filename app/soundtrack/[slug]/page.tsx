@@ -301,6 +301,7 @@ export default function SoundtrackPage() {
               audioUrl={audioUrl}
               musicReady={musicReady}
               musicLoading={musicLoading}
+              title={selectedTitle || titles[0] || 'a soundtrack'}
             />
           </motion.div>
 
@@ -399,11 +400,13 @@ function CoverWithPlayer({
   audioUrl,
   musicReady,
   musicLoading,
+  title,
 }: {
   coverUrl: string | null;
   audioUrl: string | null;
   musicReady: boolean;
   musicLoading: boolean;
+  title: string;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -429,6 +432,78 @@ function CoverWithPlayer({
       audio.removeEventListener('ended', onEnded);
     };
   }, [audioUrl]);
+
+  // ---------------------------------------------------------------------------
+  // MediaSession — populate the iOS/Android lock-screen / Control Center player
+  // with the cover artwork, title, and working play/pause controls.
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (
+      typeof navigator === 'undefined' ||
+      !('mediaSession' in navigator) ||
+      !audioUrl
+    ) {
+      return;
+    }
+
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title,
+        artist: 'Soundtrack of Your Life',
+        album: "Irina's Cabinet of Delights",
+        artwork: coverUrl
+          ? [
+              { src: coverUrl, sizes: '512x512', type: 'image/png' },
+              { src: coverUrl, sizes: '1024x1024', type: 'image/png' },
+            ]
+          : [],
+      });
+    } catch (err) {
+      // Older browsers / unsupported environments — non-fatal
+      console.warn('MediaSession metadata failed:', err);
+    }
+  }, [audioUrl, coverUrl, title]);
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) {
+      return;
+    }
+
+    const handlePlay = () => {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.play();
+        setPlaying(true);
+      }
+    };
+    const handlePause = () => {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        setPlaying(false);
+      }
+    };
+
+    navigator.mediaSession.setActionHandler('play', handlePlay);
+    navigator.mediaSession.setActionHandler('pause', handlePause);
+
+    return () => {
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('pause', null);
+    };
+  }, []);
+
+  // Keep the OS-level playback state in sync with what's happening here.
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) {
+      return;
+    }
+    try {
+      navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+    } catch {
+      /* unsupported — non-fatal */
+    }
+  }, [playing]);
 
   function toggle() {
     const audio = audioRef.current;
