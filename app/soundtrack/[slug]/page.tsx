@@ -360,7 +360,7 @@ export default function SoundtrackPage() {
           ·
         </span>
         <span>
-          made with love by{' '}
+          made by{' '}
           <a
             href="https://irina.love"
             target="_blank"

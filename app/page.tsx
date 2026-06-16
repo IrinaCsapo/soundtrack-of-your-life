@@ -48,7 +48,7 @@ export default function HomePage() {
               href="/questions"
               className="inline-block font-sans text-xs sm:text-sm tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-500 px-10 py-4 rounded-full backdrop-blur-sm bg-ink/15"
             >
-              start listening
+              create your soundtrack
             </Link>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function HomePage() {
           ·
         </span>
         <span>
-          made with love by{' '}
+          made by{' '}
           <a
             href="https://irina.love"
             target="_blank"

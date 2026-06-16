@@ -22,31 +22,19 @@ export default function AboutPage() {
 
         <div className="space-y-6 font-serif text-lg text-paper/85 leading-[1.75] italic">
           <p>
-            Soundtrack of Your Life is a small tool of delight made in Irina&apos;s
-            Cabinet of Delights. Answer a few questions about a moment — a
-            place, a feeling, a thing you remember — and a small constellation
-            of AIs makes you a soundtrack that sounds like the memory feels.
+            Soundtrack of Your Life is a small tool of delight made in
+            Irina&apos;s Cabinet of Delights. Answer a few questions about a
+            moment, a place, a feeling or a thing you remember, to turn them
+            into a soundtrack that feels like that moment.
           </p>
 
           <p>
-            Music from MusicGen. A cinematic cover from Flux. A poetic title
-            from Claude. Yours to keep. Anonymously shareable to the soundtrack
-            cabinet, where strangers can listen to one another&apos;s moments
-            without ever knowing whose they are.
+            The questions guide you from a concrete sensory anchor towards
+            something more poetic and soulful. At the end, you receive a
+            soundtrack — listenable, downloadable and shareable.
           </p>
 
-          <p>
-            The Cabinet is a series of small tools made with care. There&apos;s
-            Cosmic Pet Portraits, where your pet gets a celestial origin story.
-            There&apos;s Letters from Your Future Self, where the version of you
-            ten years ahead writes you a letter. This is the third room.
-          </p>
-
-          <p>
-            The shared idea: ordinary moments deserve reverence. A memory of
-            your grandmother&apos;s kitchen, a coastal walk with friends, a
-            Tuesday in your living room — they&apos;re all worth music.
-          </p>
+          <p>This is a gift, and it&apos;s yours to keep.</p>
 
           <p className="pt-4">
             Made with love by Irina, at{' '}
@@ -65,9 +53,9 @@ export default function AboutPage() {
         <div className="text-center pt-8">
           <Link
             href="/questions"
-            className="inline-block font-sans text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-500 px-10 py-4 rounded-full"
+            className="inline-block font-sans text-xs sm:text-sm tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-500 px-10 py-4 rounded-full"
           >
-            make yours
+            make yours now
           </Link>
         </div>
       </article>
@@ -83,7 +71,7 @@ export default function AboutPage() {
           ·
         </span>
         <span>
-          made with love by{' '}
+          made by{' '}
           <a
             href="https://irina.love"
             target="_blank"
