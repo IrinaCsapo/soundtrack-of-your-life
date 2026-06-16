@@ -13,7 +13,7 @@ export default function HomePage() {
         className="absolute inset-0 w-full h-full object-cover"
         aria-hidden
       >
-        <source src="/soundtrack-hero-video-v1.mp4" type="video/mp4" />
+        <source src="/pulsing-bg-hero-v1.mp4" type="video/mp4" />
       </video>
 
       {/* Darkening overlay so the title reads clearly over any frame of video */}
