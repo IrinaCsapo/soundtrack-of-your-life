@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SiteNav } from '@/components/SiteNav';
 
 export default function HomePage() {
   return (
@@ -22,6 +23,9 @@ export default function HomePage() {
         aria-hidden
       />
 
+      {/* Top navigation */}
+      <SiteNav />
+
       {/* Content */}
       <div className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center">
         <div className="max-w-3xl space-y-10">
@@ -29,7 +33,7 @@ export default function HomePage() {
             from Irina&apos;s Cabinet of Delights
           </p>
 
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl italic text-paper leading-[1.05] [text-shadow:0_2px_24px_rgba(0,0,0,0.4)]">
+          <h1 className="font-display wonk text-5xl sm:text-6xl md:text-7xl lg:text-8xl italic text-paper leading-[1.05] [text-shadow:0_2px_24px_rgba(0,0,0,0.4)]">
             Soundtrack of
             <br />
             Your Life
@@ -56,7 +60,7 @@ export default function HomePage() {
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
         >
-          the cabinet
+          the soundtrack cabinet
         </Link>
         <span className="text-paper/30" aria-hidden>
           ·

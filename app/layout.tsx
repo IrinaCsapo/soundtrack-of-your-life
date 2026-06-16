@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next';
-import { Crimson_Pro, Inter } from 'next/font/google';
+import { Crimson_Pro, Fraunces, Inter } from 'next/font/google';
 import './globals.css';
 
+// Body italic — Crimson Pro (existing)
 const serif = Crimson_Pro({
   subsets: ['latin'],
   weight: ['400', '500'],
@@ -9,10 +10,24 @@ const serif = Crimson_Pro({
   display: 'swap',
 });
 
+// All-caps labels — Inter (existing)
 const sans = Inter({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-sans',
+  display: 'swap',
+});
+
+// Display headings — Fraunces (new)
+// Variable axes: SOFT for softer terminals, opsz for optical sizing.
+// Use class `font-display` and toggle quirky alternates via the `.wonk` class
+// (style sets ss01 / ss02 wake the curlier letterforms).
+const display = Fraunces({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
+  axes: ['SOFT', 'opsz'],
   display: 'swap',
 });
 
@@ -57,7 +72,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable}`}>
+    <html
+      lang="en"
+      className={`${serif.variable} ${sans.variable} ${display.variable}`}
+    >
       <body className="bg-ink text-paper font-serif antialiased min-h-screen">
         {children}
       </body>

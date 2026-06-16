@@ -1,19 +1,25 @@
 import Link from 'next/link';
+import { SiteNav } from '@/components/SiteNav';
 import { supabaseAdmin } from '@/lib/supabase';
 
 // Revalidate the archive every minute so new shares appear without a deploy
 export const revalidate = 60;
 
+export const metadata = {
+  title: 'The Soundtrack Cabinet',
+};
+
 type ArchiveItem = {
   id: string;
   title: string;
   coverUrl: string | null;
+  genre: string | null;
 };
 
 async function getPublicSoundtracks(): Promise<ArchiveItem[]> {
   const { data, error } = await supabaseAdmin
     .from('soundtracks')
-    .select('id, selected_title, titles, cover_url, shared_at')
+    .select('id, selected_title, titles, cover_url, shared_at, answers')
     .eq('is_public', true)
     .not('music_url', 'is', null)
     .order('shared_at', { ascending: false })
@@ -21,29 +27,37 @@ async function getPublicSoundtracks(): Promise<ArchiveItem[]> {
 
   if (error || !data) return [];
 
-  return data.map((s) => ({
-    id: s.id,
-    title:
-      s.selected_title ||
-      (Array.isArray(s.titles) && s.titles.length > 0
-        ? s.titles[0]
-        : 'untitled'),
-    coverUrl: s.cover_url,
-  }));
+  return data.map((s) => {
+    const answers = (s.answers ?? {}) as Record<string, string>;
+    return {
+      id: s.id,
+      title:
+        s.selected_title ||
+        (Array.isArray(s.titles) && s.titles.length > 0
+          ? s.titles[0]
+          : 'untitled'),
+      coverUrl: s.cover_url,
+      genre: answers.q4 || null,
+    };
+  });
 }
 
 export default async function ArchivePage() {
   const soundtracks = await getPublicSoundtracks();
 
   return (
-    <main className="min-h-screen px-6 py-20">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen relative px-6 py-20">
+      <SiteNav />
+
+      <div className="max-w-5xl mx-auto pt-12 sm:pt-16">
         {/* Header */}
         <div className="text-center space-y-3 mb-16">
           <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-whisper/70">
-            the cabinet&apos;s
+            the
           </p>
-          <h1 className="font-serif text-5xl text-paper italic">archive</h1>
+          <h1 className="font-display wonk text-5xl sm:text-6xl text-paper italic leading-tight">
+            Soundtrack Cabinet
+          </h1>
           <p className="font-serif italic text-whisper/80 text-base pt-4 max-w-md mx-auto leading-relaxed">
             soundtracks people have shared anonymously. each one is a moment
             someone wanted to keep.
@@ -78,9 +92,16 @@ export default async function ArchivePage() {
                     <div className="w-full h-full bg-gradient-to-br from-warmth via-ink to-warmth" />
                   )}
                 </div>
-                <p className="font-serif italic text-paper text-sm leading-tight group-hover:text-brass transition-colors duration-300">
-                  {s.title}
-                </p>
+                <div className="space-y-1">
+                  <p className="font-serif italic text-paper text-base leading-tight group-hover:text-brass transition-colors duration-300">
+                    {s.title}
+                  </p>
+                  {s.genre && (
+                    <p className="font-sans text-[9px] tracking-[0.25em] uppercase text-brass/70 group-hover:text-brass transition-colors duration-300">
+                      {s.genre}
+                    </p>
+                  )}
+                </div>
               </Link>
             ))}
           </div>

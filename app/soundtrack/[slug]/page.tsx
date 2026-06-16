@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
+import { SiteNav } from '@/components/SiteNav';
 
 type Status =
   | 'starting'
@@ -201,6 +202,7 @@ export default function SoundtrackPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20 relative">
+      <SiteNav />
       {hasFailed ? (
         <motion.div
           initial={{ opacity: 0 }}
@@ -242,7 +244,7 @@ export default function SoundtrackPage() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="font-serif text-4xl text-paper italic leading-tight"
+                  className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight"
                 >
                   {selectedTitle}
                 </motion.h1>
@@ -280,7 +282,7 @@ export default function SoundtrackPage() {
                       </button>
                     </>
                   ) : (
-                    <h1 className="font-serif text-4xl text-paper italic leading-tight">
+                    <h1 className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight">
                       untitled, for now
                     </h1>
                   )}
@@ -367,7 +369,7 @@ export default function SoundtrackPage() {
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
         >
-          the cabinet
+          the soundtrack cabinet
         </a>
         <span className="text-whisper/30" aria-hidden>
           ·

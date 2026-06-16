@@ -48,3 +48,10 @@ body {
 .poetry-input:focus {
   outline: none;
 }
+
+/* Fraunces — wake up the quirky stylistic alternates for display moments.
+   Apply with className="wonk" alongside font-display. */
+.wonk {
+  font-feature-settings: 'ss01' on, 'ss02' on, 'ss03' on, 'liga' on;
+  font-variation-settings: 'SOFT' 50, 'opsz' 144;
+}

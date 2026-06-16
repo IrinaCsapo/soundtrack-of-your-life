@@ -16,6 +16,7 @@ const config: Config = {
         brass: 'var(--brass)',
       },
       fontFamily: {
+        display: ['var(--font-display)', 'serif'],
         serif: ['var(--font-serif)', 'serif'],
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },

@@ -187,7 +187,7 @@ export default function QuestionsPage() {
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
         >
-          the cabinet
+          the soundtrack cabinet
         </Link>
         <span className="text-paper/30" aria-hidden>
           ·
