@@ -87,15 +87,23 @@ export default async function ArchivePage() {
         )}
 
         {/* Footer */}
-        <div className="mt-24 text-center space-y-4">
+        <div className="mt-24 text-center space-y-6">
           <Link
             href="/questions"
             className="inline-block font-sans text-[11px] tracking-[0.25em] uppercase text-whisper hover:text-brass transition-colors duration-300"
           >
             make your own
           </Link>
-          <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-whisper/60 pt-8">
-            from Irina&apos;s Cabinet of Delights
+          <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-whisper/65 pt-8">
+            made with love by{' '}
+            <a
+              href="https://irina.love"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+            >
+              irina.love
+            </a>
           </p>
         </div>
       </div>

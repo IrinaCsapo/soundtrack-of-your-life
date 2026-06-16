@@ -362,7 +362,7 @@ export default function SoundtrackPage() {
         </motion.div>
       )}
 
-      <footer className="absolute bottom-8 font-sans text-[10px] tracking-[0.3em] uppercase text-whisper/60 flex items-center gap-3">
+      <footer className="absolute bottom-8 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-whisper/65 flex items-center justify-center gap-3 px-6">
         <a
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
@@ -372,7 +372,17 @@ export default function SoundtrackPage() {
         <span className="text-whisper/30" aria-hidden>
           ·
         </span>
-        <span>from Irina&apos;s Cabinet of Delights</span>
+        <span>
+          made with love by{' '}
+          <a
+            href="https://irina.love"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+          >
+            irina.love
+          </a>
+        </span>
       </footer>
     </main>
   );

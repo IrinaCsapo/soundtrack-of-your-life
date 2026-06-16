@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { questions } from '@/lib/questions';
+import { GRADIENTS, gradientForStep } from '@/lib/gradients';
 
 export default function QuestionsPage() {
   const router = useRouter();
@@ -12,13 +14,23 @@ export default function QuestionsPage() {
   const [submitting, setSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Random starting gradient per session so each visit feels different
+  const [gradientStartIdx] = useState(() =>
+    Math.floor(Math.random() * GRADIENTS.length)
+  );
+
   const currentQuestion = questions[step];
   const isLast = step === questions.length - 1;
   const currentAnswer = answers[currentQuestion.id] ?? '';
   const canAdvance =
     currentAnswer.trim().length > 0 || currentQuestion.skippable;
+  const stepLabel = formatStepNumber(step + 1);
+  const totalLabel = formatStepNumber(questions.length);
+  const gradient = useMemo(
+    () => gradientForStep(gradientStartIdx, step),
+    [gradientStartIdx, step]
+  );
 
-  // Auto-focus the textarea every time we change step (only for text questions)
   useEffect(() => {
     if (currentQuestion.type !== 'genre') {
       const t = setTimeout(() => textareaRef.current?.focus(), 50);
@@ -58,10 +70,6 @@ export default function QuestionsPage() {
         throw new Error(error || 'generation request failed');
       }
       const { slug } = await res.json();
-
-      // Answers + titles are now persisted server-side (in Supabase) and
-      // returned by /api/soundtrack/[id]/status, so no sessionStorage needed.
-
       router.push(`/soundtrack/${slug}`);
     } catch (err) {
       console.error(err);
@@ -78,89 +86,130 @@ export default function QuestionsPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
-      <div className="w-full max-w-2xl space-y-10">
-        <AnimatePresence mode="wait">
+    <main className="min-h-screen relative overflow-hidden bg-ink">
+      {/* Gradient background — cross-fades on step change */}
+      <div className="fixed inset-0 -z-10" aria-hidden>
+        <AnimatePresence mode="sync">
           <motion.div
-            key={step}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-8"
-          >
-            <h1 className="font-serif text-2xl md:text-3xl text-paper leading-snug">
-              {currentQuestion.text}
-            </h1>
-
-            {currentQuestion.type === 'genre' ? (
-              <GenreSelector
-                value={currentAnswer}
-                onChange={update}
-                options={currentQuestion.options ?? []}
-                placeholder={currentQuestion.placeholder}
-              />
-            ) : (
-              <textarea
-                ref={textareaRef}
-                className="poetry-input"
-                placeholder={currentQuestion.placeholder}
-                value={currentAnswer}
-                onChange={(e) => update(e.target.value)}
-                onKeyDown={onKeyDown}
-                rows={3}
-                aria-label={currentQuestion.text}
-              />
-            )}
-          </motion.div>
+            key={gradient}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.6, ease: 'easeInOut' }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${gradient})` }}
+          />
         </AnimatePresence>
+        {/* Vignette + dark overlay so question text always reads */}
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/35 to-ink/70" />
+      </div>
 
-        <div className="flex items-center justify-between pt-6 font-sans text-xs tracking-[0.25em] uppercase">
-          <button
-            onClick={back}
-            disabled={step === 0}
-            className="text-whisper hover:text-brass transition-colors duration-300 disabled:opacity-0"
-            aria-label="previous question"
-          >
-            back
-          </button>
+      {/* Top: pagination */}
+      <header className="absolute top-0 left-0 right-0 pt-8 sm:pt-10 px-6 flex justify-center">
+        <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.4em] uppercase text-paper/70 flex items-center gap-2">
+          <span className="text-brass">{stepLabel}</span>
+          <span className="text-paper/30" aria-hidden>
+            /
+          </span>
+          <span>{totalLabel}</span>
+        </div>
+      </header>
 
-          <div
-            className="flex gap-2"
-            aria-label={`step ${step + 1} of ${questions.length}`}
-          >
-            {questions.map((_, i) => (
-              <span
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${
-                  i === step ? 'bg-brass' : 'bg-whisper/40'
-                }`}
-              />
-            ))}
+      {/* Center: question */}
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-32">
+        <div className="w-full max-w-2xl space-y-10">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="space-y-8"
+            >
+              <h1 className="font-serif text-2xl md:text-3xl text-paper leading-snug text-center [text-shadow:0_2px_24px_rgba(0,0,0,0.4)]">
+                {currentQuestion.text}
+              </h1>
+
+              {currentQuestion.type === 'genre' ? (
+                <GenreSelector
+                  value={currentAnswer}
+                  onChange={update}
+                  options={currentQuestion.options ?? []}
+                  placeholder={currentQuestion.placeholder}
+                />
+              ) : (
+                <textarea
+                  ref={textareaRef}
+                  className="poetry-input"
+                  placeholder={currentQuestion.placeholder}
+                  value={currentAnswer}
+                  onChange={(e) => update(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  rows={3}
+                  aria-label={currentQuestion.text}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Back / Next */}
+          <div className="flex items-center justify-between pt-4 font-sans text-xs tracking-[0.25em] uppercase">
+            <button
+              onClick={back}
+              disabled={step === 0}
+              className="text-paper/85 hover:text-brass transition-colors duration-300 disabled:opacity-0"
+              aria-label="previous question"
+            >
+              back
+            </button>
+            <button
+              onClick={next}
+              disabled={!canAdvance || submitting}
+              className="text-paper/85 hover:text-brass transition-colors duration-300 disabled:opacity-30 disabled:hover:text-paper/85"
+              aria-label={isLast ? 'generate soundtrack' : 'next question'}
+            >
+              {submitting ? 'brewing…' : isLast ? 'make it' : 'next'}
+            </button>
           </div>
 
-          <button
-            onClick={next}
-            disabled={!canAdvance || submitting}
-            className="text-whisper hover:text-brass transition-colors duration-300 disabled:opacity-30 disabled:hover:text-whisper"
-            aria-label={isLast ? 'generate soundtrack' : 'next question'}
-          >
-            {submitting ? 'brewing…' : isLast ? 'make it' : 'next'}
-          </button>
+          {currentQuestion.skippable && currentAnswer.trim().length === 0 && (
+            <p className="text-center font-sans text-[11px] tracking-[0.2em] uppercase text-paper/55 pt-2">
+              you can skip this one
+            </p>
+          )}
         </div>
-
-        {currentQuestion.skippable && currentAnswer.trim().length === 0 && (
-          <p className="text-center font-sans text-[11px] tracking-[0.2em] uppercase text-whisper/60 pt-2">
-            you can skip this one
-          </p>
-        )}
       </div>
+
+      {/* Footer */}
+      <footer className="absolute bottom-6 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex items-center justify-center gap-3 px-6">
+        <Link
+          href="/archive"
+          className="hover:text-brass transition-colors duration-300"
+        >
+          the cabinet
+        </Link>
+        <span className="text-paper/30" aria-hidden>
+          ·
+        </span>
+        <span>
+          made with love by{' '}
+          <a
+            href="https://irina.love"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+          >
+            irina.love
+          </a>
+        </span>
+      </footer>
     </main>
   );
 }
 
 // ---------------------------------------------------------------------------
-// GenreSelector — chips + an "or write your own" field
+// Genre selector with chips + custom field
 // ---------------------------------------------------------------------------
 
 function GenreSelector({
@@ -177,7 +226,6 @@ function GenreSelector({
   const isCustom = value.length > 0 && !options.includes(value);
   const [customText, setCustomText] = useState(isCustom ? value : '');
 
-  // Keep the custom field in sync if the value changes externally
   useEffect(() => {
     if (isCustom) setCustomText(value);
   }, [isCustom, value]);
@@ -202,10 +250,10 @@ function GenreSelector({
               key={opt}
               type="button"
               onClick={() => pickChip(opt)}
-              className={`px-4 py-2 rounded-full border text-sm font-serif italic transition-colors duration-300 ${
+              className={`px-4 py-2 rounded-full border text-sm font-serif italic backdrop-blur-sm transition-colors duration-300 ${
                 selected
-                  ? 'border-brass text-brass bg-brass/5'
-                  : 'border-whisper/30 text-whisper hover:border-whisper hover:text-paper'
+                  ? 'border-brass text-brass bg-brass/10'
+                  : 'border-paper/30 text-paper/85 hover:border-paper hover:text-paper bg-ink/20'
               }`}
             >
               {opt}
@@ -215,7 +263,7 @@ function GenreSelector({
       </div>
 
       <div className="flex flex-col items-center gap-3 pt-2">
-        <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-whisper/60">
+        <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-paper/65">
           or write your own
         </p>
         <input
@@ -224,9 +272,17 @@ function GenreSelector({
           onChange={(e) => typeCustom(e.target.value)}
           placeholder={placeholder}
           aria-label="custom genre"
-          className="w-full max-w-sm text-center bg-transparent border-b border-whisper/30 focus:border-brass text-paper font-serif italic placeholder:text-whisper/50 placeholder:italic py-2 outline-none transition-colors duration-300"
+          className="w-full max-w-sm text-center bg-transparent border-b border-paper/30 focus:border-brass text-paper font-serif italic placeholder:text-paper/45 placeholder:italic py-2 outline-none transition-colors duration-300"
         />
       </div>
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function formatStepNumber(n: number): string {
+  return String(n).padStart(2, '0');
 }

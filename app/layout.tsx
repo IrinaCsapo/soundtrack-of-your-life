@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Crimson_Pro, Inter } from 'next/font/google';
 import './globals.css';
 
@@ -16,9 +16,39 @@ const sans = Inter({
   display: 'swap',
 });
 
+const SITE_URL = 'https://soundtrack.irina.love';
+const SITE_TITLE = 'Soundtrack of Your Life';
+const SITE_DESCRIPTION =
+  "Tell me about a moment. I'll make it into music — a custom lo-fi/ambient track with a cinematic cover and a poetic title.";
+
 export const metadata: Metadata = {
-  title: 'Soundtrack of Your Life',
-  description: "Tell me about a moment. I'll make it into music.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: '%s — Soundtrack of Your Life',
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: SITE_TITLE,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  creator: 'irina.love',
+  authors: [{ name: 'Irina Csapo', url: 'https://irina.love' }],
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0E0D11',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -28,10 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable}`}>
-      <body
-        className="bg-ink text-paper font-serif antialiased min-h-screen"
-        suppressHydrationWarning
-      >
+      <body className="bg-ink text-paper font-serif antialiased min-h-screen">
         {children}
       </body>
     </html>
