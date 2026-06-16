@@ -86,9 +86,14 @@ export default function QuestionsPage() {
   }
 
   return (
-    <main className="min-h-screen relative overflow-hidden bg-ink">
-      {/* Gradient background — cross-fades on step change */}
-      <div className="fixed inset-0 -z-10" aria-hidden>
+    <main className="min-h-screen relative overflow-hidden">
+      {/* Gradient background — cross-fades on step change.
+          Fixed so it always covers viewport. pointer-events-none so it
+          doesn't block clicks on content above. */}
+      <div
+        className="fixed inset-0 pointer-events-none bg-ink"
+        aria-hidden
+      >
         <AnimatePresence mode="sync">
           <motion.div
             key={gradient}
@@ -105,7 +110,7 @@ export default function QuestionsPage() {
       </div>
 
       {/* Top: pagination */}
-      <header className="absolute top-0 left-0 right-0 pt-8 sm:pt-10 px-6 flex justify-center">
+      <header className="absolute top-0 left-0 right-0 z-10 pt-8 sm:pt-10 px-6 flex justify-center">
         <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.4em] uppercase text-paper/70 flex items-center gap-2">
           <span className="text-brass">{stepLabel}</span>
           <span className="text-paper/30" aria-hidden>
@@ -116,7 +121,7 @@ export default function QuestionsPage() {
       </header>
 
       {/* Center: question */}
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-32">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-32">
         <div className="w-full max-w-2xl space-y-10">
           <AnimatePresence mode="wait">
             <motion.div
@@ -182,7 +187,7 @@ export default function QuestionsPage() {
       </div>
 
       {/* Footer */}
-      <footer className="absolute bottom-6 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex items-center justify-center gap-3 px-6">
+      <footer className="absolute bottom-6 left-0 right-0 z-10 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex items-center justify-center gap-3 px-6">
         <Link
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
