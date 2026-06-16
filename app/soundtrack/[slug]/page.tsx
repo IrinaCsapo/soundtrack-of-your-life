@@ -1,9 +1,28 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { SiteNav } from '@/components/SiteNav';
+import { GRADIENTS } from '@/lib/gradients';
+
+/** Deterministic gradient pick from the soundtrack slug — same soundtrack
+ *  always has the same background, so shareable links look consistent. */
+function gradientForSlug(slug: string): string {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = (hash << 5) - hash + slug.charCodeAt(i);
+    hash |= 0;
+  }
+  return GRADIENTS[Math.abs(hash) % GRADIENTS.length];
+}
+
+const LOADING_MESSAGES = [
+  'your soundtrack is finding its shape',
+  'stitching the memory into music',
+  'translating your moment into sound',
+  'the music is finding you',
+];
 
 type Status =
   | 'starting'
@@ -200,15 +219,25 @@ export default function SoundtrackPage() {
   const hasFailed =
     status === 'failed' || status === 'canceled' || (error && !audioUrl);
 
+  const gradient = useMemo(() => gradientForSlug(id), [id]);
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20 relative">
+    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20 relative overflow-hidden">
+      {/* Gradient background — deterministic from slug */}
+      <div className="fixed inset-0 pointer-events-none bg-ink" aria-hidden>
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${gradient})`, opacity: 0.45 }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/45 to-ink/85" />
+      </div>
       <SiteNav />
       {hasFailed ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="text-center space-y-6 max-w-md"
+          className="relative z-10 text-center space-y-6 max-w-md"
         >
           <p className="font-serif text-xl text-paper italic">
             the music got lost on the way
@@ -228,66 +257,25 @@ export default function SoundtrackPage() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-md text-center"
+          className="relative z-10 w-full max-w-md text-center"
         >
-          {/* Title block — chosen title or pick-one */}
+          {/* Title block — auto-picked (no picker UI anymore) */}
           <motion.div variants={itemVariants} className="space-y-4">
-            <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-whisper/70">
+            <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-paper/70 [text-shadow:0_2px_12px_rgba(0,0,0,0.6)]">
               your soundtrack
             </p>
 
             <AnimatePresence mode="wait">
-              {selectedTitle ? (
-                <motion.h1
-                  key={`title-${selectedTitle}`}
-                  variants={titleSwapVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight"
-                >
-                  {selectedTitle}
-                </motion.h1>
-              ) : (
-                <motion.div
-                  key="title-picker"
-                  variants={titleSwapVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="space-y-3"
-                >
-                  {titles.length > 0 ? (
-                    <>
-                      <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-whisper/50">
-                        pick one
-                      </p>
-                      <div className="space-y-2">
-                        {titles.map((t, i) => (
-                          <button
-                            key={`${t}-${i}`}
-                            onClick={() => pickTitle(t)}
-                            className="block mx-auto font-serif text-2xl italic text-paper/85 hover:text-brass transition-colors duration-300"
-                          >
-                            {t}
-                          </button>
-                        ))}
-                      </div>
-                      <button
-                        onClick={shuffleTitles}
-                        disabled={shuffling || !answers}
-                        className="pt-2 font-sans text-[10px] tracking-[0.25em] uppercase text-whisper/60 hover:text-brass transition-colors duration-300 disabled:opacity-40"
-                      >
-                        {shuffling ? 'shuffling…' : 'shuffle'}
-                      </button>
-                    </>
-                  ) : (
-                    <h1 className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight">
-                      untitled, for now
-                    </h1>
-                  )}
-                </motion.div>
-              )}
+              <motion.h1
+                key={`title-${selectedTitle || titles[0] || 'loading'}`}
+                variants={titleSwapVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)]"
+              >
+                {selectedTitle || titles[0] || 'finding your title…'}
+              </motion.h1>
             </AnimatePresence>
           </motion.div>
 
@@ -319,7 +307,7 @@ export default function SoundtrackPage() {
                   <motion.p
                     key={key}
                     variants={lineVariants}
-                    className="font-serif italic text-whisper/85 text-base leading-[1.7]"
+                    className="font-serif italic text-paper/90 text-base leading-[1.7] [text-shadow:0_2px_18px_rgba(0,0,0,0.6)]"
                   >
                     {value}
                   </motion.p>
@@ -327,37 +315,33 @@ export default function SoundtrackPage() {
             </motion.div>
           )}
 
-          {/* Actions */}
+          {/* Actions — prominent pill buttons */}
           <motion.div
             variants={itemVariants}
-            className="flex items-center justify-center gap-4 font-sans text-[11px] tracking-[0.25em] uppercase"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2"
           >
             {audioUrl ? (
               <button
                 onClick={downloadAudio}
                 disabled={downloading}
-                className="text-whisper hover:text-brass transition-colors duration-300 disabled:opacity-40"
+                className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30 disabled:opacity-50"
               >
                 {downloading ? 'saving…' : 'download mp3'}
               </button>
             ) : (
-              <span className="text-whisper/30">download mp3</span>
+              <span className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper/30 border border-paper/20 px-7 py-3 rounded-full">
+                download mp3
+              </span>
             )}
-            <span className="text-whisper/30" aria-hidden>
-              ·
-            </span>
             <button
               onClick={copyLink}
-              className="text-whisper hover:text-brass transition-colors duration-300"
+              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
             >
               {copied ? 'copied' : 'copy link'}
             </button>
-            <span className="text-whisper/30" aria-hidden>
-              ·
-            </span>
             <a
               href="/questions"
-              className="text-whisper hover:text-brass transition-colors duration-300"
+              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
             >
               make another
             </a>
@@ -365,7 +349,7 @@ export default function SoundtrackPage() {
         </motion.div>
       )}
 
-      <footer className="absolute bottom-8 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-whisper/65 flex items-center justify-center gap-3 px-6">
+      <footer className="absolute bottom-8 left-0 right-0 z-10 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/70 flex items-center justify-center gap-3 px-6">
         <a
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
@@ -647,28 +631,59 @@ function CoverPlaceholder() {
 }
 
 function LoadingPulse() {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIdx((i) => (i + 1) % LOADING_MESSAGES.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="text-center space-y-3">
-      <motion.p
-        animate={{ opacity: [0.55, 1, 0.55] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        className="font-serif text-base text-paper italic"
-      >
-        the music is finding you
-      </motion.p>
-      <motion.div
-        animate={{ opacity: [0.25, 0.9, 0.25] }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: 0.6,
-        }}
-        className="flex justify-center"
-        aria-hidden
-      >
-        <span className="w-1 h-1 rounded-full bg-brass" />
-      </motion.div>
+    <div className="text-center space-y-7 px-6">
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={idx}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 0.95, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          className="font-display italic text-base sm:text-lg text-paper [text-shadow:0_2px_18px_rgba(0,0,0,0.7)]"
+        >
+          {LOADING_MESSAGES[idx]}
+        </motion.p>
+      </AnimatePresence>
+
+      {/* Triple-ripple pulse */}
+      <div className="relative w-14 h-14 mx-auto">
+        <motion.span
+          animate={{ scale: [1, 2.4, 1], opacity: [0.5, 0, 0.5] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+          className="absolute inset-0 rounded-full border border-brass"
+          aria-hidden
+        />
+        <motion.span
+          animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0.05, 0.6] }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'easeOut',
+            delay: 0.6,
+          }}
+          className="absolute inset-0 rounded-full border border-brass/70"
+          aria-hidden
+        />
+        <motion.span
+          animate={{
+            scale: [0.85, 1.15, 0.85],
+            opacity: [0.85, 0.55, 0.85],
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-[18px] rounded-full bg-brass/50"
+          aria-hidden
+        />
+      </div>
     </div>
   );
 }

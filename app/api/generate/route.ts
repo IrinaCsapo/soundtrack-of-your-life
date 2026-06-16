@@ -93,7 +93,8 @@ export async function POST(request: Request) {
 
     // 4. Persist soundtrack record (music prediction ID is the slug).
     //    Default to public — soundtracks join the Cabinet automatically.
-    //    We never collect identifying info, so this is safe by design.
+    //    Auto-select the first title (Claude is instructed to put the
+    //    weirdest/most poetic one first) — no picker UI on reveal.
     const now = new Date().toISOString();
     const { error: insertError } = await supabaseAdmin
       .from('soundtracks')
@@ -103,6 +104,7 @@ export async function POST(request: Request) {
         music_prompt: musicPrompt,
         visual_prompt: visualPrompt,
         titles,
+        selected_title: titles[0] ?? null,
         music_replicate_id: musicPrediction.id,
         cover_replicate_id: coverPrediction.id,
         music_status: 'starting',

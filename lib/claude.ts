@@ -23,9 +23,21 @@ const METADATA_SYSTEM_PROMPT = `You translate a user's memory into THREE things:
 
 1. A MUSIC generation prompt for MusicGen (Meta's text-to-music model). Describe genre, instruments, mood, tempo, texture. The music should sound like the memory feels. Concrete sonic vocabulary, not abstract poetry. If the user specifies a genre, make it the frame; if not, default to lo-fi ambient.
 
-2. A VISUAL generation prompt for Flux (text-to-image model) for the soundtrack's square (1:1) album cover. PHOTOGRAPHIC / CINEMATIC style — like a film still of the memory. NOT literal or generic. Specify camera vocabulary (35mm film grain, shallow depth of field, golden hour, golden glass light, etc.), composition (album-cover-worthy framing, figures in middle distance, no faces), and mood. Atmospheric, intimate, painterly light. Photograph quality, not illustration.
+2. A VISUAL generation prompt for Flux (text-to-image model) for the soundtrack's square (1:1) album cover.
 
-3. Three poetic CANDIDATE TITLES for the soundtrack — distinct from each other in mood or angle.
+CRITICAL DIRECTION: This is an ABSTRACT, DREAMLIKE, EXPERIMENTAL piece of album art. Not a depiction. Not a scene. Not photography. A visual interpretation of the FEELING of the memory, never the literal contents of it.
+
+Reference aesthetics: Brian Eno's Music for Airports, Cocteau Twins / 4AD record sleeves, Boards of Canada album art, William Basinski's Disintegration Loops, Burial covers, Aphex Twin record art. Atmospheric, swirling, painterly, mysterious, slightly broken or decayed.
+
+Vocabulary to draw from (combine freely): abstract oil painting, swirling color fields, soft melting forms, light leaks, smoke, ink wash, photogram, mixed media collage, polaroid disintegration, oil-on-water, holographic shimmer, glitched film scan, scratched emulsion, frozen mist, layered transparencies, watercolor bleeds, double exposure, dreamlike textures, expressionist brush strokes, melting wax, broken mirrors.
+
+Be specific about: MEDIUM (oil painting / ink wash / glitched film scan / mixed-media collage / pinhole photography / cyanotype / etc.), COLOR PALETTE (the emotional weather of the memory — be specific with named colours), and TEXTURE QUALITY (smooth / grainy / swirling / melting / fractured / liquid).
+
+STRICTLY AVOID: any literal scene depiction, human figures, faces, recognizable rooms, kitchens, windows, kettles, beds, bedrooms, sunlight streaming through windows, photoreal portraits, photoreal landscapes, generic stock photography aesthetics, cute illustration, vector art, geometric perfection, anything that looks like a film still or movie poster.
+
+Should feel like: a memory that's started to dissolve, the inside of a dream, the texture of music itself, a feeling you can't quite name. Closer to a painting hanging in a contemporary art gallery than a photograph from anyone's life.
+
+3. Three poetic CANDIDATE TITLES for the soundtrack — distinct from each other in mood or angle. THE FIRST TITLE SHOULD BE THE WEIRDEST AND MOST POETIC of the three — a phrase that surprises, that doesn't immediately reveal what it's about, that could be a line in an experimental poetry book. The first title is the one we'll save by default.
 
 ${TITLE_VOICE_EXAMPLES}
 
