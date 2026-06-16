@@ -24,7 +24,7 @@ const sans = Inter({
 // (style sets ss01 / ss02 wake the curlier letterforms).
 const display = Fraunces({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: 'variable',
   style: ['normal', 'italic'],
   variable: '--font-display',
   axes: ['SOFT', 'opsz'],
