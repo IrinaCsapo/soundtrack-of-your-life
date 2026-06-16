@@ -5,7 +5,48 @@ export const alt = 'Soundtrack of Your Life';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
+/**
+ * Fetch a subset of a Google Font for use inside ImageResponse.
+ * The `text` parameter ensures we only download the characters we need.
+ */
+async function loadGoogleFont(
+  family: string,
+  text: string
+): Promise<ArrayBuffer> {
+  const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
+    family
+  )}&text=${encodeURIComponent(text)}`;
+
+  const css = await (
+    await fetch(url, {
+      headers: {
+        // Google Fonts returns different formats based on User-Agent.
+        // This UA gets a clean TTF/WOFF URL we can pull binary from.
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+      },
+    })
+  ).text();
+
+  const match = css.match(
+    /src: url\((.+?)\) format\('(opentype|truetype|woff2|woff)'\)/
+  );
+  if (!match) throw new Error('Failed to extract font URL from Google Fonts');
+
+  const fontData = await (await fetch(match[1])).arrayBuffer();
+  return fontData;
+}
+
 export default async function OG() {
+  const heroText = 'Soundtrack of Your Life';
+  const taglineText = "tell me about a moment. I'll make it into music.";
+  const subsetText = heroText + taglineText;
+
+  const fraunces = await loadGoogleFont(
+    'Fraunces:ital,wght@1,500',
+    subsetText
+  );
+
   return new ImageResponse(
     (
       <div
@@ -23,7 +64,7 @@ export default async function OG() {
             'radial-gradient(circle at 75% 70%, #EC4899 0%, transparent 45%),' +
             'radial-gradient(circle at 90% 20%, #F97316 0%, transparent 35%),' +
             'linear-gradient(135deg, #1A1226 0%, #0E0D11 60%, #0E0D11 100%)',
-          fontFamily: 'serif',
+          fontFamily: 'sans-serif',
         }}
       >
         <div
@@ -33,7 +74,6 @@ export default async function OG() {
             textTransform: 'uppercase',
             color: 'rgba(236,231,220,0.7)',
             marginBottom: 36,
-            fontFamily: 'sans-serif',
             fontWeight: 500,
           }}
         >
@@ -44,6 +84,7 @@ export default async function OG() {
           style={{
             fontSize: 120,
             fontStyle: 'italic',
+            fontFamily: 'Fraunces',
             lineHeight: 1,
             marginBottom: 36,
             textAlign: 'center',
@@ -60,6 +101,7 @@ export default async function OG() {
           style={{
             fontSize: 30,
             fontStyle: 'italic',
+            fontFamily: 'Fraunces',
             color: 'rgba(236,231,220,0.85)',
             marginBottom: 50,
             textAlign: 'center',
@@ -74,7 +116,6 @@ export default async function OG() {
             letterSpacing: 8,
             textTransform: 'uppercase',
             color: 'rgba(201,183,156,0.95)',
-            fontFamily: 'sans-serif',
             fontWeight: 500,
           }}
         >
@@ -82,6 +123,16 @@ export default async function OG() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        {
+          name: 'Fraunces',
+          data: fraunces,
+          style: 'italic',
+          weight: 500,
+        },
+      ],
+    }
   );
 }

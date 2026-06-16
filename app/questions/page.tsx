@@ -127,7 +127,7 @@ export default function QuestionsPage() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="space-y-8"
             >
-              <h1 className="font-serif text-2xl md:text-3xl text-paper leading-snug text-center [text-shadow:0_2px_24px_rgba(0,0,0,0.4)]">
+              <h1 className="font-display text-3xl md:text-4xl italic text-paper leading-snug text-center [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)]">
                 {currentQuestion.text}
               </h1>
 
