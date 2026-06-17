@@ -127,16 +127,32 @@ export default async function ArchivePage() {
           >
             make your own
           </Link>
-          <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65">
-            made by{' '}
-            <a
-              href="https://irina.love"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
-            >
-              irina.love
-            </a>
+          <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+            <span>
+              made by{' '}
+              <a
+                href="https://irina.love"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+              >
+                irina.love
+              </a>
+            </span>
+            <span className="text-paper/30" aria-hidden>
+              ·
+            </span>
+            <span>
+              gradients by{' '}
+              <a
+                href="https://fabianafiesmann.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+              >
+                fabiana fiesmann
+              </a>
+            </span>
           </p>
         </div>
       </div>

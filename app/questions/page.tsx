@@ -158,12 +158,12 @@ export default function QuestionsPage() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Back / Next */}
-          <div className="flex items-center justify-between pt-4 font-sans text-xs tracking-[0.25em] uppercase">
+          {/* Back / Next — prominent pill buttons */}
+          <div className="flex items-center justify-between pt-4 gap-3">
             <button
               onClick={back}
               disabled={step === 0}
-              className="text-paper/85 hover:text-brass transition-colors duration-300 disabled:opacity-0"
+              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-6 sm:px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30 disabled:opacity-0 disabled:pointer-events-none"
               aria-label="previous question"
             >
               back
@@ -171,10 +171,14 @@ export default function QuestionsPage() {
             <button
               onClick={next}
               disabled={!canAdvance || submitting}
-              className="text-paper/85 hover:text-brass transition-colors duration-300 disabled:opacity-30 disabled:hover:text-paper/85"
+              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-6 sm:px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30 disabled:opacity-40 disabled:hover:border-paper/45 disabled:hover:text-paper"
               aria-label={isLast ? 'generate soundtrack' : 'next question'}
             >
-              {submitting ? 'brewing…' : isLast ? 'make it' : 'next'}
+              {submitting
+                ? 'creating soundtrack…'
+                : isLast
+                  ? 'make it'
+                  : 'next'}
             </button>
           </div>
 
@@ -187,7 +191,7 @@ export default function QuestionsPage() {
       </div>
 
       {/* Footer */}
-      <footer className="absolute bottom-6 left-0 right-0 z-10 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex items-center justify-center gap-3 px-6">
+      <footer className="absolute bottom-6 left-0 right-0 z-10 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6">
         <Link
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
@@ -206,6 +210,20 @@ export default function QuestionsPage() {
             className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
           >
             irina.love
+          </a>
+        </span>
+        <span className="text-paper/30" aria-hidden>
+          ·
+        </span>
+        <span>
+          gradients by{' '}
+          <a
+            href="https://fabianafiesmann.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+          >
+            fabiana fiesmann
           </a>
         </span>
       </footer>

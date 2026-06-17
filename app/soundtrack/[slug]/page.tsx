@@ -349,14 +349,14 @@ export default function SoundtrackPage() {
         </motion.div>
       )}
 
-      <footer className="absolute bottom-8 left-0 right-0 z-10 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/70 flex items-center justify-center gap-3 px-6">
+      <footer className="absolute bottom-8 left-0 right-0 z-10 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/70 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6">
         <a
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
         >
           the soundtrack cabinet
         </a>
-        <span className="text-whisper/30" aria-hidden>
+        <span className="text-paper/30" aria-hidden>
           ·
         </span>
         <span>
@@ -368,6 +368,20 @@ export default function SoundtrackPage() {
             className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
           >
             irina.love
+          </a>
+        </span>
+        <span className="text-paper/30" aria-hidden>
+          ·
+        </span>
+        <span>
+          gradients by{' '}
+          <a
+            href="https://fabianafiesmann.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+          >
+            fabiana fiesmann
           </a>
         </span>
       </footer>

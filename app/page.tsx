@@ -55,7 +55,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="absolute bottom-6 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex items-center justify-center gap-3 px-6">
+      <footer className="absolute bottom-6 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6">
         <Link
           href="/archive"
           className="hover:text-brass transition-colors duration-300"
@@ -74,6 +74,20 @@ export default function HomePage() {
             className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
           >
             irina.love
+          </a>
+        </span>
+        <span className="text-paper/30" aria-hidden>
+          ·
+        </span>
+        <span>
+          gradients by{' '}
+          <a
+            href="https://fabianafiesmann.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+          >
+            fabiana fiesmann
           </a>
         </span>
       </footer>
