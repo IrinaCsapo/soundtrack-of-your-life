@@ -40,7 +40,7 @@ body {
 }
 
 .poetry-input::placeholder {
-  color: var(--whisper);
+  color: rgba(236, 231, 220, 0.5);
   font-style: italic;
 }
 

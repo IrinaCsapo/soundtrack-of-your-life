@@ -698,6 +698,10 @@ function LoadingPulse() {
           aria-hidden
         />
       </div>
+
+      <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/60 leading-relaxed max-w-[260px] mx-auto pt-2 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+        this can take a minute or two — keep this tab open
+      </p>
     </div>
   );
 }

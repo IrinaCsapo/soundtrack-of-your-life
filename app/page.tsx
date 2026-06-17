@@ -40,7 +40,7 @@ export default function HomePage() {
           </h1>
 
           <p className="font-serif italic text-lg sm:text-xl text-paper/85 max-w-md mx-auto leading-relaxed">
-            tell me about a moment. I&apos;ll make it into music.
+            Tell me about a moment. I&apos;ll make it into music.
           </p>
 
           <div className="pt-4">
