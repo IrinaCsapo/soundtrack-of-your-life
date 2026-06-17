@@ -12,6 +12,9 @@ export default function QuestionsPage() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [moderationMessage, setModerationMessage] = useState<string | null>(
+    null
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Random starting gradient per session so each visit feels different
@@ -64,18 +67,31 @@ export default function QuestionsPage() {
         body: JSON.stringify({ answers }),
       });
       if (!res.ok) {
-        const { error } = await res
+        const data = await res
           .json()
           .catch(() => ({ error: 'generation request failed' }));
-        throw new Error(error || 'generation request failed');
+        // Moderation gate — show the Cabinet's gentle message inline
+        if (data.blocked && typeof data.error === 'string') {
+          setModerationMessage(data.error);
+          setSubmitting(false);
+          return;
+        }
+        throw new Error(data.error || 'generation request failed');
       }
       const { slug } = await res.json();
       router.push(`/soundtrack/${slug}`);
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : 'something went wrong');
+      alert(err instanceof Error ? err.message : 'Something went wrong.');
       setSubmitting(false);
     }
+  }
+
+  function dismissModeration() {
+    setModerationMessage(null);
+    // Send them back to the first question so they can rewrite.
+    // Their previous answers stay in state in case they want to keep parts.
+    setStep(0);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -120,8 +136,26 @@ export default function QuestionsPage() {
         </div>
       </header>
 
-      {/* Center: question */}
+      {/* Center: question (or moderation message when blocked) */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-32">
+        {moderationMessage ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full max-w-2xl text-center space-y-10"
+          >
+            <p className="font-display italic text-2xl sm:text-3xl text-paper leading-snug [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)]">
+              {moderationMessage}
+            </p>
+            <button
+              onClick={dismissModeration}
+              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
+            >
+              try a different memory
+            </button>
+          </motion.div>
+        ) : (
         <div className="w-full max-w-2xl space-y-10">
           <AnimatePresence mode="wait">
             <motion.div
@@ -188,6 +222,7 @@ export default function QuestionsPage() {
             </p>
           )}
         </div>
+        )}
       </div>
 
       {/* Footer */}

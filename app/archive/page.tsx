@@ -71,7 +71,7 @@ export default async function ArchivePage() {
             Soundtrack Cabinet
           </h1>
           <p className="font-serif italic text-paper/85 text-base pt-4 max-w-md mx-auto leading-relaxed [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
-            soundtracks people have shared anonymously. each one is a moment
+            Soundtracks people have shared anonymously. Each one is a moment
             someone wanted to keep.
           </p>
         </div>
@@ -80,7 +80,7 @@ export default async function ArchivePage() {
         {soundtracks.length === 0 ? (
           <div className="text-center pt-10 space-y-6">
             <p className="font-serif italic text-paper/75 [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
-              no shared soundtracks yet.
+              No shared soundtracks yet.
             </p>
             <Link
               href="/questions"

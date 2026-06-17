@@ -39,7 +39,7 @@ async function loadGoogleFont(
 
 export default async function OG() {
   const heroText = 'Soundtrack of Your Life';
-  const taglineText = "tell me about a moment. I'll make it into music.";
+  const taglineText = "Tell me about a moment. I'll make it into music.";
   const subsetText = heroText + taglineText;
 
   const fraunces = await loadGoogleFont(
@@ -107,7 +107,7 @@ export default async function OG() {
             textAlign: 'center',
           }}
         >
-          tell me about a moment. I&apos;ll make it into music.
+          Tell me about a moment. I&apos;ll make it into music.
         </div>
 
         <div

@@ -7,6 +7,7 @@ import {
   getLatestCoverVersion,
 } from '@/lib/replicate';
 import { generateSoundtrackMetadata } from '@/lib/claude';
+import { checkModeration, MODERATION_MESSAGES } from '@/lib/moderation';
 import { supabaseAdmin } from '@/lib/supabase';
 
 // Vercel: allow up to 30s for prediction creation. Actual generation runs on
@@ -63,9 +64,41 @@ export async function POST(request: Request) {
   }
 
   try {
-    // 1. Claude — music prompt + visual prompt + titles in one call
-    const { musicPrompt, visualPrompt, titles } =
-      await generateSoundtrackMetadata(answers);
+    // 0. Moderation gate — Claude classifies the answers. If flagged,
+    //    return the Cabinet's gentle rejection message and stop here.
+    const verdict = await checkModeration(answers);
+    if (verdict !== 'ALLOWED') {
+      console.log('[generate] moderation blocked:', verdict);
+      return NextResponse.json(
+        {
+          error: MODERATION_MESSAGES[verdict],
+          blocked: true,
+          category: verdict,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 1. Claude — music prompt + visual prompt + titles in one call.
+    //    If Claude refuses (returns non-JSON) we treat that as a soft
+    //    moderation failure rather than crashing with a server error.
+    let musicPrompt: string, visualPrompt: string, titles: string[];
+    try {
+      const metadata = await generateSoundtrackMetadata(answers);
+      musicPrompt = metadata.musicPrompt;
+      visualPrompt = metadata.visualPrompt;
+      titles = metadata.titles;
+    } catch (err) {
+      console.error('[generate] metadata refusal / parse error:', err);
+      return NextResponse.json(
+        {
+          error: MODERATION_MESSAGES.UNFIT,
+          blocked: true,
+          category: 'UNFIT',
+        },
+        { status: 400 }
+      );
+    }
     console.log('[generate] music prompt:', musicPrompt);
     console.log('[generate] visual prompt:', visualPrompt);
     console.log('[generate] titles:', titles);

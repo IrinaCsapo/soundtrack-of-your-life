@@ -18,10 +18,10 @@ function gradientForSlug(slug: string): string {
 }
 
 const LOADING_MESSAGES = [
-  'your soundtrack is finding its shape',
-  'stitching the memory into music',
-  'translating your moment into sound',
-  'the music is finding you',
+  'Your soundtrack is finding its shape',
+  'Stitching the memory into music',
+  'Translating your moment into sound',
+  'The music is finding you',
 ];
 
 type Status =
@@ -128,7 +128,7 @@ export default function SoundtrackPage() {
           timer = setTimeout(poll, 2000);
         }
       } catch {
-        if (!cancelled) setError('lost connection — try refreshing');
+        if (!cancelled) setError('Lost connection — try refreshing.');
       }
     }
 
@@ -240,10 +240,10 @@ export default function SoundtrackPage() {
           className="relative z-10 text-center space-y-6 max-w-md"
         >
           <p className="font-serif text-xl text-paper italic">
-            the music got lost on the way
+            The music got lost on the way.
           </p>
           <p className="font-sans text-sm text-whisper">
-            {error ?? 'something went wrong with the generation'}
+            {error ?? 'Something went wrong with the generation.'}
           </p>
           <a
             href="/questions"
@@ -274,7 +274,7 @@ export default function SoundtrackPage() {
                 exit="exit"
                 className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)]"
               >
-                {selectedTitle || titles[0] || 'finding your title…'}
+                {selectedTitle || titles[0] || 'Finding your title…'}
               </motion.h1>
             </AnimatePresence>
           </motion.div>
