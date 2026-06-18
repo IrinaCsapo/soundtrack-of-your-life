@@ -1,27 +1,13 @@
 import Link from 'next/link';
 import { SiteNav } from '@/components/SiteNav';
+import { AnimatedGradientHero } from '@/components/AnimatedGradientHero';
 
 export default function HomePage() {
   return (
     <main className="min-h-screen relative overflow-hidden bg-ink">
-      {/* Video background */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        className="absolute inset-0 w-full h-full object-cover"
-        aria-hidden
-      >
-        <source src="/pulsing-bg-hero-v1.mp4" type="video/mp4" />
-      </video>
-
-      {/* Darkening overlay so the title reads clearly over any frame of video */}
-      <div
-        className="absolute inset-0 bg-gradient-to-b from-ink/60 via-ink/35 to-ink/75"
-        aria-hidden
-      />
+      {/* Animated gradient hero — three layers slowly cycling through
+          Fabiana's gradient artwork with mix-blend-mode + breathing motion. */}
+      <AnimatedGradientHero />
 
       {/* Top navigation */}
       <SiteNav />

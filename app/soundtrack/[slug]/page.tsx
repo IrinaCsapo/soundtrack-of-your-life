@@ -277,6 +277,12 @@ export default function SoundtrackPage() {
                 {selectedTitle || titles[0] || 'Finding your title…'}
               </motion.h1>
             </AnimatePresence>
+
+            {answers?.q4 && (
+              <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-brass/90 [text-shadow:0_2px_12px_rgba(0,0,0,0.6)]">
+                {answers.q4}
+              </p>
+            )}
           </motion.div>
 
           {/* Cover + play button — the album-cover moment */}
