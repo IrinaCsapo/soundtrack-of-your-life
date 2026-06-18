@@ -1,19 +1,28 @@
 import Link from 'next/link';
 import { SiteNav } from '@/components/SiteNav';
-import { AnimatedGradientHero } from '@/components/AnimatedGradientHero';
+import { PingPongVideo } from '@/components/PingPongVideo';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen relative overflow-hidden bg-ink">
-      {/* Animated gradient hero — three layers slowly cycling through
-          Fabiana's gradient artwork with mix-blend-mode + breathing motion. */}
-      <AnimatedGradientHero />
+    <main className="min-h-screen min-h-[100dvh] relative overflow-hidden bg-ink flex flex-col">
+      {/* Hero video — plays forward, then backward, then forward, looping */}
+      <PingPongVideo
+        src="/soundtrack-hero-v3.mp4"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      {/* Darkening overlay so the title reads clearly over any frame */}
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-ink/60 via-ink/35 to-ink/75"
+        aria-hidden
+      />
 
       {/* Top navigation */}
       <SiteNav />
 
-      {/* Content */}
-      <div className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center">
+      {/* Content — flex-1 makes it fill the space between nav and footer.
+          Centred vertically inside that space. */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pt-24 pb-6">
         <div className="max-w-3xl space-y-10">
           <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.4em] uppercase text-paper/70">
             from Irina&apos;s Cabinet of Delights
@@ -40,8 +49,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="absolute bottom-6 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6">
+      {/* Footer — sits at the bottom of the flex column, always visible
+          on the initial viewport even on mobile. */}
+      <footer className="relative z-10 pb-5 px-6 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
         <Link
           href="/archive"
           className="hover:text-brass transition-colors duration-300"

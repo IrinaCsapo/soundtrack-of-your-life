@@ -308,7 +308,9 @@ export default function SoundtrackPage() {
               className="space-y-5 pb-10"
             >
               {Object.entries(answers)
-                .filter(([key, value]) => value && key !== 'q4')
+                .filter(
+                  ([key, value]) => value && key !== 'q4' && key !== 'q5'
+                )
                 .map(([key, value]) => (
                   <motion.p
                     key={key}

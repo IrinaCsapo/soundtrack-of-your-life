@@ -35,7 +35,11 @@ export default function QuestionsPage() {
   );
 
   useEffect(() => {
-    if (currentQuestion.type !== 'genre') {
+    // Only auto-focus textarea for free-text questions, not chip selectors
+    if (
+      currentQuestion.type !== 'genre' &&
+      currentQuestion.type !== 'mood'
+    ) {
       const t = setTimeout(() => textareaRef.current?.focus(), 50);
       return () => clearTimeout(t);
     }
@@ -166,11 +170,19 @@ export default function QuestionsPage() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="space-y-8"
             >
-              <h1 className="font-display text-3xl md:text-4xl italic text-paper leading-snug text-left [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)]">
+              <h1
+                className={`font-display text-3xl md:text-4xl italic text-paper leading-snug [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)] ${
+                  currentQuestion.type === 'genre' ||
+                  currentQuestion.type === 'mood'
+                    ? 'text-center'
+                    : 'text-left'
+                }`}
+              >
                 {currentQuestion.text}
               </h1>
 
-              {currentQuestion.type === 'genre' ? (
+              {currentQuestion.type === 'genre' ||
+              currentQuestion.type === 'mood' ? (
                 <GenreSelector
                   value={currentAnswer}
                   onChange={update}
@@ -218,7 +230,7 @@ export default function QuestionsPage() {
 
           {currentQuestion.skippable && currentAnswer.trim().length === 0 && (
             <p className="text-center font-sans text-[11px] tracking-[0.2em] uppercase text-paper/55 pt-2">
-              you can skip this one
+              You can skip this one
             </p>
           )}
         </div>

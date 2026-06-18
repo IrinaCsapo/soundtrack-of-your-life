@@ -23,15 +23,17 @@ const METADATA_SYSTEM_PROMPT = `You translate a user's memory into THREE things:
 
 1. A MUSIC generation prompt for MusicGen (Meta's text-to-music model).
 
-The music should always be PALATABLE, SOOTHING, MELANCHOLIC lo-fi ambient — gentle, accessible, comforting, easy to listen to in the background. Think: chillhop beats, slow lo-fi piano, warm acoustic guitar, soft electric piano, mellow synth pads, vinyl crackle, dreampop without distortion, gentle nostalgia, the inside of a coffee shop on a rainy afternoon, the warm wash of a candlelit room at dusk.
+The music should always be PALATABLE, SOOTHING, MELANCHOLIC lo-fi ambient — gentle, accessible, comforting, easy to listen to in the background. Think: chillhop beats, slow lo-fi piano, warm acoustic guitar, soft electric piano, mellow synth pads, vinyl crackle, dream pop without distortion, dreamwave, synthwave, ambient electronic, Cocteau Twins-style washy reverbed guitars and ethereal pads, slowcore, gentle nostalgia, the inside of a coffee shop on a rainy afternoon, the warm wash of a candlelit room at dusk.
 
-Describe: GENRE (always anchored in palatable lo-fi / ambient / chillhop / soft dreampop), INSTRUMENTS (warm acoustic guitar, soft electric piano, mellow synth pads, brushed kit or no drums, gentle bass), MOOD (melancholic, hopeful, contemplative, tender, soft, never angry or chaotic), TEMPO (slow — around 60–80 BPM), TEXTURE (warm, fuzzy, intimate, slightly nostalgic, never harsh or jarring or abrasive).
+Describe: GENRE (always anchored in palatable lo-fi / ambient electronic / dreamwave / synthwave / soft dream pop / chillhop), INSTRUMENTS (warm acoustic guitar, soft electric piano, mellow analog synth pads, reverbed lead synths, brushed kit or no drums, gentle bass), MOOD (melancholic, hopeful, contemplative, tender, soft, never angry or chaotic), TEMPO (slow — around 60–80 BPM), TEXTURE (warm, fuzzy, intimate, slightly nostalgic, never harsh or jarring or abrasive).
 
 If the user specifies a genre in q4, weave it in but always interpret it through a PALATABLE filter — "shoegaze" becomes gentle dreampop (not a wall of noise), "jazz" becomes quiet late-night piano jazz (not free jazz), "psychedelic" becomes warm hazy synths (not chaotic), "drone" becomes soft ambient drone (not harsh).
 
-STRICTLY AVOID: experimental, harsh, glitchy, dissonant, abrasive, avant-garde, noisy, atonal, broken, chaotic. The music should be a soft comforting hug, not a challenging listening experience.
+If the user specifies a mood in q5, let it strongly inform the EMOTIONAL REGISTER of the music — "Excited" / "Energised" leans brighter, more uplifting, slightly more tempo; "Sad" / "Melancholic" leans heavier, more space, more minor chords; "Calm" / "Tender" leans slower, warmer, simpler arrangements; "Hopeful" leans major chords with gentle resolution; "Restless" leans pulsing rhythms, slight tension; "Reflective" leans sparse, thoughtful. Always within the palatable lo-fi / ambient / dreamwave register.
 
-IMPORTANT: the VISUAL prompt direction below (which references Brian Eno, Boards of Canada, Burial, Aphex Twin, etc.) is for ALBUM COVER IMAGES ONLY — do NOT apply that experimental aesthetic to the music. The music stays palatable, soothing, melancholic lo-fi ambient regardless of what visual references appear later in this prompt.
+STRICTLY AVOID: experimental, harsh, glitchy, dissonant, abrasive, avant-garde, noisy, atonal, broken, chaotic. Do NOT include "Brian Eno" or "Music for Airports" references in the music prompt. The music should be a soft comforting hug, not a challenging listening experience.
+
+IMPORTANT: the VISUAL prompt direction below (which references Brian Eno, Boards of Canada, Burial, Aphex Twin, etc.) is for ALBUM COVER IMAGES ONLY — do NOT apply that experimental aesthetic to the music. The music stays palatable, soothing, melancholic lo-fi ambient / dreamwave / synthwave regardless of what visual references appear later in this prompt.
 
 2. A VISUAL generation prompt for Flux (text-to-image model) for the soundtrack's square (1:1) album cover.
 
@@ -80,8 +82,11 @@ function formatUserPrompt(answers: Answers): string {
     `Q2 — what they hear, touch, or notice: ${answers.q2 || '(skipped)'}`,
     `Q3 — what the moment whispers: ${answers.q3 || '(skipped)'}`,
     answers.q4
-      ? `Genre they want: ${answers.q4}`
+      ? `Genre they want (q4): ${answers.q4}`
       : 'Genre: not specified (use lo-fi ambient default)',
+    answers.q5
+      ? `Their current mood (q5 — use this to inform emotional register of the music): ${answers.q5}`
+      : 'Mood: not specified',
   ].join('\n');
 }
 

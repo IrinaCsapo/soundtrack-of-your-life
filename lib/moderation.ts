@@ -56,6 +56,7 @@ export async function checkModeration(
     `Q2 (sensory detail): ${answers.q2 || '(empty)'}`,
     `Q3 (what it whispers): ${answers.q3 || '(empty)'}`,
     `Q4 (music genre): ${answers.q4 || '(empty)'}`,
+    `Q5 (current mood): ${answers.q5 || '(empty)'}`,
   ].join('\n');
 
   try {
