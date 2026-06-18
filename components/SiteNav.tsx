@@ -24,7 +24,7 @@ export function SiteNav() {
   }
 
   return (
-    <nav className="absolute top-0 left-0 right-0 z-10 pt-6 sm:pt-8 px-6 flex justify-center pointer-events-none">
+    <nav className="absolute top-0 left-0 right-0 z-30 pt-6 sm:pt-8 px-6 flex justify-center pointer-events-none">
       <ul className="flex items-center gap-3 sm:gap-5 font-sans text-[10px] sm:text-[11px] tracking-[0.3em] uppercase pointer-events-auto">
         {NAV_ITEMS.map((item, i) => (
           <li key={item.href} className="flex items-center gap-3 sm:gap-5">

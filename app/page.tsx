@@ -21,9 +21,10 @@ export default function HomePage() {
       <SiteNav />
 
       {/* Content — flex-1 makes it fill the space between nav and footer.
-          Centred vertically inside that space. */}
+          Centred vertically inside that space, then shifted upward so the
+          title sits higher than dead-centre (more breathing room below). */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pt-24 pb-6">
-        <div className="max-w-3xl space-y-10">
+        <div className="max-w-3xl space-y-10 -translate-y-20 sm:-translate-y-28 md:-translate-y-[150px]">
           <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.4em] uppercase text-paper/70">
             from Irina&apos;s Cabinet of Delights
           </p>
