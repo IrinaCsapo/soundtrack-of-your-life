@@ -7,10 +7,22 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen relative bg-ink px-6 py-20">
+    <main className="min-h-screen relative overflow-hidden px-6 py-20">
+      {/* Gradient-14 background */}
+      <div className="fixed inset-0 pointer-events-none bg-ink" aria-hidden>
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url(/images/gradients/gradient-14.jpg)',
+            opacity: 0.45,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/65 via-ink/45 to-ink/80" />
+      </div>
+
       <SiteNav />
 
-      <article className="max-w-2xl mx-auto pt-12 sm:pt-16 pb-32 space-y-10">
+      <article className="relative z-10 max-w-2xl mx-auto pt-12 sm:pt-16 pb-32 space-y-10">
         <header className="text-center space-y-3">
           <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-whisper/70">
             about
@@ -74,7 +86,7 @@ export default function AboutPage() {
         </div>
       </article>
 
-      <footer className="absolute bottom-6 left-0 right-0 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6">
+      <footer className="absolute bottom-6 left-0 right-0 z-10 text-center font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6">
         <Link
           href="/archive"
           className="hover:text-brass transition-colors duration-300"

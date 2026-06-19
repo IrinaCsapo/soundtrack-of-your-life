@@ -11,11 +11,13 @@ export default function HomePage() {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Darkening overlay so the title reads clearly over any frame */}
+      {/* Gradient darkening overlay so the title reads clearly over any frame */}
       <div
         className="absolute inset-0 bg-gradient-to-b from-ink/60 via-ink/35 to-ink/75"
         aria-hidden
       />
+      {/* Additional uniform 15% darkening to make the headline pop */}
+      <div className="absolute inset-0 bg-ink/15" aria-hidden />
 
       {/* Top navigation */}
       <SiteNav />
@@ -24,7 +26,7 @@ export default function HomePage() {
           Centred vertically inside that space, then shifted upward so the
           title sits higher than dead-centre (more breathing room below). */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 text-center pt-24 pb-6">
-        <div className="max-w-3xl space-y-10 -translate-y-20 sm:-translate-y-28 md:-translate-y-[150px]">
+        <div className="max-w-3xl space-y-10 md:-translate-y-[50px]">
           <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.4em] uppercase text-paper/70">
             from Irina&apos;s Cabinet of Delights
           </p>
