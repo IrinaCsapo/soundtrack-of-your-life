@@ -9,14 +9,22 @@ export const replicate = new Replicate({
 });
 
 // ---------------------------------------------------------------------------
-// Music model — MusicGen stereo-large
+// Music model — MusicGen stereo-medium
+//
+// Tuned for SPEED, not maximum quality. stereo-medium is roughly 2x faster
+// than stereo-large while still producing musical, coherent output — perfect
+// for the palatable lo-fi/ambient register we're aiming for.
+//
+// If quality ever needs a bump, swap `model_version` back to 'stereo-large'
+// (~2x slower per generation) or bump `duration` back to 60.
+// If speed needs to go even further, try 'stereo-small' or drop duration to 20.
 // ---------------------------------------------------------------------------
 
 export const MUSIC_MODEL = 'meta/musicgen';
 
 export const MUSIC_INPUT_DEFAULTS = {
-  model_version: 'stereo-large' as const,
-  duration: 60, // 60 seconds — bumped up from 30 for fuller pieces
+  model_version: 'stereo-medium' as const,
+  duration: 30,
   output_format: 'mp3' as const,
   normalization_strategy: 'loudness' as const,
 };
