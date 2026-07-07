@@ -9,21 +9,26 @@ export const replicate = new Replicate({
 });
 
 // ---------------------------------------------------------------------------
-// Music model — MusicGen stereo-medium
+// Music model — MusicGen stereo-large at 30 seconds
 //
-// Tuned for SPEED, not maximum quality. stereo-medium is roughly 2x faster
-// than stereo-large while still producing musical, coherent output — perfect
-// for the palatable lo-fi/ambient register we're aiming for.
+// Replicate's meta/musicgen only exposes the large variants (no medium/small).
+// So our only levers for speed are: (1) duration, (2) mono vs stereo, or
+// (3) switching to a different model entirely (e.g. stable-audio-open).
 //
-// If quality ever needs a bump, swap `model_version` back to 'stereo-large'
-// (~2x slower per generation) or bump `duration` back to 60.
-// If speed needs to go even further, try 'stereo-small' or drop duration to 20.
+// Current settings prioritise quality: keep stereo-large, but shorten duration
+// from 60s → 30s, which halves generation time. Roughly 90–120s per soundtrack
+// warm, ~180s cold-start.
+//
+// If speed still isn't enough:
+//   - Drop model_version to 'large' (mono) — slightly faster
+//   - Drop duration to 20 — nearly instant but very short piece
+//   - Switch MUSIC_MODEL to 'stackadoc/stable-audio-open-1.0' — 15–30s per gen
 // ---------------------------------------------------------------------------
 
 export const MUSIC_MODEL = 'meta/musicgen';
 
 export const MUSIC_INPUT_DEFAULTS = {
-  model_version: 'stereo-medium' as const,
+  model_version: 'stereo-large' as const,
   duration: 30,
   output_format: 'mp3' as const,
   normalization_strategy: 'loudness' as const,
