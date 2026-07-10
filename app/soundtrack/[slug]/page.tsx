@@ -8,7 +8,6 @@ import {
   type Variants,
 } from 'framer-motion';
 import { SiteNav } from '@/components/SiteNav';
-import { VinylRecord } from '@/components/VinylRecord';
 import { GRADIENTS } from '@/lib/gradients';
 
 /** Deterministic gradient START index from the soundtrack slug — the reveal
@@ -322,7 +321,7 @@ export default function SoundtrackPage() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10 w-full max-w-md text-center"
+          className="relative z-10 w-full max-w-xl text-center"
         >
           {/* Title block — auto-picked (no picker UI anymore) */}
           <motion.div variants={itemVariants} className="space-y-4">
@@ -396,7 +395,9 @@ export default function SoundtrackPage() {
             </motion.div>
           )}
 
-          {/* Actions — prominent pill buttons */}
+          {/* Actions — three pills side-by-side on desktop, stacked on
+              mobile. `whitespace-nowrap` on each pill so heavily-tracked
+              labels never wrap to two lines. */}
           <motion.div
             variants={itemVariants}
             className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2"
@@ -405,24 +406,24 @@ export default function SoundtrackPage() {
               <button
                 onClick={downloadAudio}
                 disabled={downloading}
-                className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30 disabled:opacity-50"
+                className="inline-flex items-center justify-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30 disabled:opacity-50"
               >
                 {downloading ? 'saving…' : 'download mp3'}
               </button>
             ) : (
-              <span className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper/30 border border-paper/20 px-7 py-3 rounded-full">
+              <span className="inline-flex items-center justify-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper/30 border border-paper/20 px-7 py-3 rounded-full">
                 download mp3
               </span>
             )}
             <button
               onClick={copyLink}
-              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
+              className="inline-flex items-center justify-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
             >
               {copied ? 'copied' : 'copy link'}
             </button>
             <a
               href="/questions"
-              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
+              className="inline-flex items-center justify-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
             >
               make another
             </a>
@@ -635,32 +636,6 @@ function CoverWithPlayer({
           }}
           aria-hidden
         />
-
-        {/* Bottom gradient — makes the album-art title readable over any cover */}
-        <div
-          className="absolute inset-x-0 bottom-0 h-2/5 pointer-events-none bg-gradient-to-t from-ink/85 via-ink/45 to-transparent"
-          aria-hidden
-        />
-
-        {/* Album-art title overlay — the cover becomes a shareable object.
-            Positioned bottom-left in the "text-safe" area the visual prompt
-            reserves. Italic Fraunces to match the site's display voice. */}
-        {coverUrl && (
-          <motion.div
-            key={`cover-title-${title}`}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
-            className="absolute left-4 right-4 bottom-3 sm:bottom-4 pointer-events-none"
-          >
-            <p className="font-display wonk italic text-paper text-lg sm:text-xl leading-[1.15] [text-shadow:0_2px_16px_rgba(0,0,0,0.9),0_1px_3px_rgba(0,0,0,0.7)] line-clamp-2">
-              {title}
-            </p>
-            <p className="mt-1 font-sans text-[9px] tracking-[0.3em] uppercase text-paper/75 [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
-              Soundtrack of Your Life
-            </p>
-          </motion.div>
-        )}
       </div>
 
       {/* Play / pause button */}
@@ -732,7 +707,7 @@ function CoverWithPlayer({
             )}
           </motion.button>
         ) : musicLoading ? (
-          <LoadingRecord />
+          <LoadingPulse />
         ) : null}
       </div>
     </div>
@@ -752,12 +727,12 @@ function CoverPlaceholder() {
 }
 
 // ---------------------------------------------------------------------------
-// LoadingRecord — spinning vinyl + rotating loading messages. Stands in for
-// the play button while music is generating. The vinyl itself is the shared
-// <VinylRecord> component (also used on the questions page during submit).
+// LoadingPulse — rotating loading messages + a triple-ripple brass pulse
+// while music is generating. Sits in place of the play button inside the
+// cover square.
 // ---------------------------------------------------------------------------
 
-function LoadingRecord() {
+function LoadingPulse() {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
@@ -768,8 +743,7 @@ function LoadingRecord() {
   }, []);
 
   return (
-    <div className="text-center space-y-5 px-6">
-      {/* Rotating loading message above the record */}
+    <div className="text-center space-y-7 px-6">
       <AnimatePresence mode="wait">
         <motion.p
           key={idx}
@@ -783,13 +757,39 @@ function LoadingRecord() {
         </motion.p>
       </AnimatePresence>
 
-      {/* Spinning vinyl */}
-      <div className="mx-auto">
-        <VinylRecord idSuffix="reveal" />
+      {/* Triple-ripple brass pulse — two expanding rings + a soft filled
+          centre that breathes. Subtle enough not to compete with the
+          gradient motion behind the cover. */}
+      <div className="relative w-14 h-14 mx-auto">
+        <motion.span
+          animate={{ scale: [1, 2.4, 1], opacity: [0.5, 0, 0.5] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+          className="absolute inset-0 rounded-full border border-brass"
+          aria-hidden
+        />
+        <motion.span
+          animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0.05, 0.6] }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'easeOut',
+            delay: 0.6,
+          }}
+          className="absolute inset-0 rounded-full border border-brass/70"
+          aria-hidden
+        />
+        <motion.span
+          animate={{
+            scale: [0.85, 1.15, 0.85],
+            opacity: [0.85, 0.55, 0.85],
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-[18px] rounded-full bg-brass/50"
+          aria-hidden
+        />
       </div>
 
-      {/* Waiting note below the record */}
-      <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/60 leading-relaxed max-w-[260px] mx-auto [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+      <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/60 leading-relaxed max-w-[260px] mx-auto pt-2 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
         this can take a minute or two — keep this tab open
       </p>
     </div>

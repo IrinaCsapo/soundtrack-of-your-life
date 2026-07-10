@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { questions } from '@/lib/questions';
 import { GRADIENTS, gradientForStep } from '@/lib/gradients';
-import { VinylRecord } from '@/components/VinylRecord';
 
 // Loading messages cycled through while the create-soundtrack API call is in
 // flight. Same phrasing / rhythm as the reveal page so the transition into
@@ -444,7 +443,7 @@ function SubmittingState() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="text-center space-y-6"
+      className="text-center space-y-8"
     >
       <AnimatePresence mode="wait">
         <motion.p
@@ -459,8 +458,36 @@ function SubmittingState() {
         </motion.p>
       </AnimatePresence>
 
-      <div className="mx-auto">
-        <VinylRecord idSuffix="submit" />
+      {/* Triple-ripple brass pulse — same loader as the reveal-page
+          LoadingPulse so the visual language stays consistent across the
+          transition into /soundtrack/[slug]. */}
+      <div className="relative w-14 h-14 mx-auto">
+        <motion.span
+          animate={{ scale: [1, 2.4, 1], opacity: [0.5, 0, 0.5] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+          className="absolute inset-0 rounded-full border border-brass"
+          aria-hidden
+        />
+        <motion.span
+          animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0.05, 0.6] }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'easeOut',
+            delay: 0.6,
+          }}
+          className="absolute inset-0 rounded-full border border-brass/70"
+          aria-hidden
+        />
+        <motion.span
+          animate={{
+            scale: [0.85, 1.15, 0.85],
+            opacity: [0.85, 0.55, 0.85],
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-[18px] rounded-full bg-brass/50"
+          aria-hidden
+        />
       </div>
 
       <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/55 max-w-[260px] mx-auto [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">

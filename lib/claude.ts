@@ -78,7 +78,7 @@ CRITICALLY: MINE THE USER'S ANSWERS for specific visual details:
 
 The cover should feel like it was designed specifically for THEIR memory, using visual language drawn from what they wrote.
 
-COMPOSITION NOTE: leave the LOWER-LEFT THIRD of the composition relatively negative or simple (a solid colour block, an area of quiet paint, empty photographic sky). A title will be overlaid via CSS in that region, so the cover needs breathing room there.
+COMPOSITION NOTE: the cover benefits from some negative or quieter space somewhere in the frame (a solid colour block, an area of quiet paint, empty photographic sky) so the composition breathes. Don't fill every square inch with detail.
 
 Be specific about:
 - MEDIUM (mixed-media collage / painterly abstract with photographic fragments / duotone photography / cassette culture / vintage typographic design / halftone print / riso print)
@@ -93,7 +93,7 @@ STRICTLY AVOID:
 - Cute illustration, vector art, geometric perfection
 - Photorealistic portraits, faces, generic stock photography
 - Pure landscape photography without collage/graphic elements
-- Any actual readable text or letterforms rendered by Flux (text is overlaid later via CSS — do NOT include titles in the image itself)
+- Any actual readable text or letterforms — Flux garbles text badly and it always looks like broken AI-generated typography. NO titles, artist names, or any words in the image itself.
 
 Should feel like: A record sleeve you'd flip past in a small vinyl shop and pull out to look closer. Hand-designed, mixing photography and graphic marks. Bold, personal, curated. Distinctly NOT generic AI art.
 
