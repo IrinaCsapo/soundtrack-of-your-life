@@ -55,17 +55,47 @@ IMPORTANT: the VISUAL prompt direction below is for ALBUM COVER IMAGES ONLY — 
 
 2. A VISUAL generation prompt for Flux (text-to-image model) for the soundtrack's square (1:1) album cover.
 
-CRITICAL DIRECTION: This is an ABSTRACT, DREAMLIKE, EXPERIMENTAL piece of album art. Not a depiction. Not a scene. Not photography. A visual interpretation of the FEELING of the memory, never the literal contents of it.
+CORE DIRECTION: BOLD, COLOURFUL contemporary album cover art. Think independent label record sleeves — mixed-media collage, bold graphic marks, torn photographic elements arranged expressively, saturated colour blocking, vintage cassette culture, hand-made feel with digital finishing. Real album covers designed for real music.
 
-Reference aesthetics: Brian Eno's Music for Airports, Cocteau Twins / 4AD record sleeves, Boards of Canada album art, William Basinski's Disintegration Loops, Burial covers, Aphex Twin record art. Atmospheric, swirling, painterly, mysterious, slightly broken or decayed.
+REFERENCE AESTHETICS (rotate 1–2 per generation to keep the archive diverse):
+- alt-J "This Is All Yours" — thick painterly bold colour blocking, primary colours slashed across white ground
+- The Chemical Brothers "Surrender" — high-contrast duotone concert photography, colour-treated crowds
+- Marley Carroll "Flight Patterns" — atmospheric dotted/stippled halftone textures forming shapes
+- James K "Hyacinth" — magazine-style photographic collage with sparkles, layered overlays, scattered text-like fragments
+- My Friend x Tommy Farrow "Forget Nothing EP" — torn paper collage with organic blue/orange shapes, vintage vinyl label typography
+- 18 Carat Affair "Spent Passions 2" — vaporwave neon glitch, gradient neon type, cybernetic elements, ballerina statue with chromatic aberration
+- There's Talk — photographic collage torn and geometrically arranged with graphic circles, halftone stripes, colour gradient blocks
+- Acid Jazz "Chronic Trax Vol 1" — retro '90s compilation aesthetic, bold serif typography, blue and orange bands, distressed record photograph
+- Ninja Tune / Warp / 4AD / Blue Note-style independent label record sleeves — bold graphic, colour-blocked, textural
 
-Vocabulary to draw from (combine freely): abstract oil painting, swirling color fields, soft melting forms, light leaks, smoke, ink wash, photogram, mixed media collage, polaroid disintegration, oil-on-water, holographic shimmer, glitched film scan, scratched emulsion, frozen mist, layered transparencies, watercolor bleeds, double exposure, dreamlike textures, expressionist brush strokes, melting wax, broken mirrors.
+Aesthetics also welcome: painterly gestural marks over photography, cassette culture, vaporwave-adjacent, retro club flyer, distressed screenprint, riso print, 90s zine.
 
-Be specific about: MEDIUM (oil painting / ink wash / glitched film scan / mixed-media collage / pinhole photography / cyanotype / etc.), COLOR PALETTE (the emotional weather of the memory — be specific with named colours), and TEXTURE QUALITY (smooth / grainy / swirling / melting / fractured / liquid).
+CRITICALLY: MINE THE USER'S ANSWERS for specific visual details:
 
-STRICTLY AVOID: any literal scene depiction, human figures, faces, recognizable rooms, kitchens, windows, kettles, beds, bedrooms, sunlight streaming through windows, photoreal portraits, photoreal landscapes, generic stock photography aesthetics, cute illustration, vector art, geometric perfection, anything that looks like a film still or movie poster.
+- Extract 2–3 SPECIFIC COLOURS from what they wrote. If they mention "golden afternoon" → gold + honey + warm cream palette. If "cold blue morning" → deep blue + steel + off-white. If "dusk" → violet + peach + amber. If they mention no specific colours, choose a bold saturated palette that matches the emotional register.
+- Extract 1–2 SPECIFIC OBJECTS or TEXTURES they mentioned and include as photographic collage elements — a kettle, a road, a bed, an old book, hands, curtains, a car interior, a sky. These become real photographic fragments in the collage, not the whole image.
+- Extract atmospheric qualities they mentioned (rain, wind, warmth, cold, motion) and translate to visual textures — film grain, water droplets, motion blur, warm light glow, cold shadow.
 
-Should feel like: a memory that's started to dissolve, the inside of a dream, the texture of music itself, a feeling you can't quite name. Closer to a painting hanging in a contemporary art gallery than a photograph from anyone's life.
+The cover should feel like it was designed specifically for THEIR memory, using visual language drawn from what they wrote.
+
+COMPOSITION NOTE: leave the LOWER-LEFT THIRD of the composition relatively negative or simple (a solid colour block, an area of quiet paint, empty photographic sky). A title will be overlaid via CSS in that region, so the cover needs breathing room there.
+
+Be specific about:
+- MEDIUM (mixed-media collage / painterly abstract with photographic fragments / duotone photography / cassette culture / vintage typographic design / halftone print / riso print)
+- COLOUR PALETTE (specific bold saturated colours drawn from user's answers, NOT muted pastels)
+- KEY VISUAL ELEMENTS drawn from their memory (specific objects, textures, atmospheric qualities they mentioned) — these should appear as concrete photographic or painted fragments, not as a whole literal scene
+
+STRICTLY AVOID:
+- Watercolour dreamy abstract washes with no clear subject (this is what our current covers ALL look like — we're moving away from this)
+- Muted pastel palettes — go saturated
+- Generic AI-abstract-art with no reference to the memory
+- Foggy misty landscape defaults
+- Cute illustration, vector art, geometric perfection
+- Photorealistic portraits, faces, generic stock photography
+- Pure landscape photography without collage/graphic elements
+- Any actual readable text or letterforms rendered by Flux (text is overlaid later via CSS — do NOT include titles in the image itself)
+
+Should feel like: A record sleeve you'd flip past in a small vinyl shop and pull out to look closer. Hand-designed, mixing photography and graphic marks. Bold, personal, curated. Distinctly NOT generic AI art.
 
 3. Three poetic CANDIDATE TITLES for the soundtrack — distinct from each other in mood or angle. THE FIRST TITLE SHOULD BE THE WEIRDEST AND MOST POETIC of the three — a phrase that surprises, that doesn't immediately reveal what it's about, that could be a line in an experimental poetry book. The first title is the one we'll save by default.
 

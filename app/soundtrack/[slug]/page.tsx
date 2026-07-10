@@ -562,6 +562,32 @@ function CoverWithPlayer({
           }}
           aria-hidden
         />
+
+        {/* Bottom gradient — makes the album-art title readable over any cover */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-2/5 pointer-events-none bg-gradient-to-t from-ink/85 via-ink/45 to-transparent"
+          aria-hidden
+        />
+
+        {/* Album-art title overlay — the cover becomes a shareable object.
+            Positioned bottom-left in the "text-safe" area the visual prompt
+            reserves. Italic Fraunces to match the site's display voice. */}
+        {coverUrl && (
+          <motion.div
+            key={`cover-title-${title}`}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
+            className="absolute left-4 right-4 bottom-3 sm:bottom-4 pointer-events-none"
+          >
+            <p className="font-display wonk italic text-paper text-lg sm:text-xl leading-[1.15] [text-shadow:0_2px_16px_rgba(0,0,0,0.9),0_1px_3px_rgba(0,0,0,0.7)] line-clamp-2">
+              {title}
+            </p>
+            <p className="mt-1 font-sans text-[9px] tracking-[0.3em] uppercase text-paper/75 [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
+              Soundtrack of Your Life
+            </p>
+          </motion.div>
+        )}
       </div>
 
       {/* Play / pause button */}
