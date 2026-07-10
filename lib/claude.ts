@@ -23,17 +23,35 @@ const METADATA_SYSTEM_PROMPT = `You translate a user's memory into THREE things:
 
 1. A MUSIC generation prompt for MusicGen (Meta's text-to-music model).
 
-The music should always be PALATABLE, SOOTHING, MELANCHOLIC lo-fi ambient — gentle, accessible, comforting, easy to listen to in the background. Think: chillhop beats, slow lo-fi piano, warm acoustic guitar, soft electric piano, mellow synth pads, vinyl crackle, dream pop without distortion, dreamwave, synthwave, ambient electronic, Cocteau Twins-style washy reverbed guitars and ethereal pads, slowcore, gentle nostalgia, the inside of a coffee shop on a rainy afternoon, the warm wash of a candlelit room at dusk.
+CORE AESTHETIC: WARM DOWNTEMPO ELECTRONIC with GROOVE, PULSE, and dreamy atmosphere. Not pure ambient wash. There must always be SOMETHING MOVING — a soft kick pattern, a warm bass pulse, a Rhodes arpeggio, a breathing pad rhythm. Palatable, listenable, beautiful, but with life and motion in it.
 
-Describe: GENRE (always anchored in palatable lo-fi / ambient electronic / dreamwave / synthwave / soft dream pop / chillhop), INSTRUMENTS (warm acoustic guitar, soft electric piano, mellow analog synth pads, reverbed lead synths, brushed kit or no drums, gentle bass), MOOD (melancholic, hopeful, contemplative, tender, soft, never angry or chaotic), TEMPO (slow — around 60–80 BPM), TEXTURE (warm, fuzzy, intimate, slightly nostalgic, never harsh or jarring or abrasive).
+REFERENCE ARTISTS (choose 2–3 per generation and rotate — MusicGen responds to named artist references, so this both diversifies output AND anchors the vibe). Weave the references naturally into the prompt:
 
-If the user specifies a genre in q4, weave it in but always interpret it through a PALATABLE filter — "shoegaze" becomes gentle dreampop (not a wall of noise), "jazz" becomes quiet late-night piano jazz (not free jazz), "psychedelic" becomes warm hazy synths (not chaotic), "drone" becomes soft ambient drone (not harsh).
+- Air (Moon Safari era, "All I Need") — warm analog synth downtempo, mellow French rhythm
+- Cocteau Twins (Cherry Coloured Funk) — ethereal reverbed dreamy guitars, ethereal pads
+- Aphex Twin — his MELODIC AMBIENT works only (Xtal, Heliosphan) — soft-pulsing melodic ambient techno, NOT his harsh/experimental stuff
+- The Chemical Brothers — the ATMOSPHERIC side ("The Darkness That You Fear") — cinematic electronic with movement, not big beat
+- Björk (Big Time Sensuality era) — playful rhythmic electronic with warm textures
+- Andrew Prahlow (Outer Wilds soundtrack) — atmospheric acoustic and orchestral ambient
+- System Olympia (6am Romance) — retro synth romance, dreamy Italo
+- Boards of Canada — hazy nostalgic downtempo electronic
+- Confidence Man (mellow tracks) — indie electronic warmth
+- Magenta Club (Avec Toi) — French chill electronic
 
-If the user specifies a mood in q5, let it strongly inform the EMOTIONAL REGISTER of the music — "Excited" / "Energised" leans brighter, more uplifting, slightly more tempo; "Sad" / "Melancholic" leans heavier, more space, more minor chords; "Calm" / "Tender" leans slower, warmer, simpler arrangements; "Hopeful" leans major chords with gentle resolution; "Restless" leans pulsing rhythms, slight tension; "Reflective" leans sparse, thoughtful. Always within the palatable lo-fi / ambient / dreamwave register.
+Describe:
+- GENRE (draw from: downtempo electronic, chillwave, dream pop, atmospheric big beat, warm analog synth, ambient techno with pulse, French downtempo, Italo dreamwave)
+- INSTRUMENTS (warm analog synths — Moog, Juno, Rhodes electric piano, mellotron pads, soft acoustic guitar, dreamy reverb-drenched electric guitar, gentle programmed drums or soft drum machine, warm bass pulse, vinyl crackle, subtle arpeggios)
+- MOOD (nostalgic, tender, dreamy, mysterious, warm, melancholic, contemplative, occasionally playful — always with emotional weight)
+- TEMPO (70–95 BPM — slow to mid-tempo, but WITH PULSE; there should always be a sense of gentle motion)
+- TEXTURE (warm, analog, slightly grainy, spacious but ALIVE — pads breathe, arpeggios pulse, subtle rhythmic elements throughout)
 
-STRICTLY AVOID: experimental, harsh, glitchy, dissonant, abrasive, avant-garde, noisy, atonal, broken, chaotic. Do NOT include "Brian Eno" or "Music for Airports" references in the music prompt. The music should be a soft comforting hug, not a challenging listening experience.
+If q4 specifies a genre, weave it through the references — "shoegaze" leans Cocteau Twins washy reverb, "jazz" becomes downtempo Rhodes jazz, "psychedelic chillwave" leans Air Moon Safari or Aphex Twin melodic ambient, "haunted piano" leans Prahlow, "midnight jazz" leans System Olympia synth romance, "forgotten radio" leans Boards of Canada nostalgia, "distorted lullaby" leans Cocteau Twins, "crystalline drone" leans Aphex Twin Xtal.
 
-IMPORTANT: the VISUAL prompt direction below (which references Brian Eno, Boards of Canada, Burial, Aphex Twin, etc.) is for ALBUM COVER IMAGES ONLY — do NOT apply that experimental aesthetic to the music. The music stays palatable, soothing, melancholic lo-fi ambient / dreamwave / synthwave regardless of what visual references appear later in this prompt.
+If q5 specifies a mood, shift emphasis — Excited/Energised → Chemical Brothers atmospheric + Björk warmth; Melancholic/Sad → Cocteau Twins + Prahlow; Calm/Tender → Air Moon Safari; Restless → Aphex Twin pulsing; Reflective → Prahlow atmospheric acoustic; Hopeful → Air sunny mornings.
+
+STRICTLY AVOID: pure static ambient wash without any rhythm, cinematic scoring drones, harsh experimental noise, aggressive dance BPMs over 100, big beat drops, vocals or lyrics, generic lo-fi hip-hop beats, elevator music, meditation music. Do NOT include "Brian Eno" or "Music for Airports" or any pure-ambient reference — those pushed the previous prompts too far into static wash territory.
+
+IMPORTANT: the VISUAL prompt direction below is for ALBUM COVER IMAGES ONLY — do NOT apply that experimental aesthetic to the music. The music stays in the warm downtempo electronic / dreamwave / atmospheric-with-pulse register.
 
 2. A VISUAL generation prompt for Flux (text-to-image model) for the soundtrack's square (1:1) album cover.
 
