@@ -5,22 +5,32 @@ import { useParams } from 'next/navigation';
 import {
   AnimatePresence,
   motion,
-  useReducedMotion,
   type Variants,
 } from 'framer-motion';
 import { SiteNav } from '@/components/SiteNav';
+import { VinylRecord } from '@/components/VinylRecord';
 import { GRADIENTS } from '@/lib/gradients';
 
-/** Deterministic gradient pick from the soundtrack slug — same soundtrack
- *  always has the same background, so shareable links look consistent. */
-function gradientForSlug(slug: string): string {
+/** Deterministic gradient START index from the soundtrack slug — the reveal
+ *  page then cycles through a rotating sequence beginning at that index, so
+ *  every soundtrack has its own "first colour" (making shareable links look
+ *  consistent on first paint) while still feeling alive over time. */
+function gradientStartIndexForSlug(slug: string): number {
   let hash = 0;
   for (let i = 0; i < slug.length; i++) {
     hash = (hash << 5) - hash + slug.charCodeAt(i);
     hash |= 0;
   }
-  return GRADIENTS[Math.abs(hash) % GRADIENTS.length];
+  return Math.abs(hash) % GRADIENTS.length;
 }
+
+/** How many gradients the reveal page cycles through before wrapping. Kept
+ *  small (4) so the palette feels curated to each soundtrack rather than
+ *  running through the whole library. */
+const GRADIENT_CYCLE_LENGTH = 4;
+
+/** Ms between gradient crossfades. Slow enough to breathe, not distracting. */
+const GRADIENT_CYCLE_MS = 22_000;
 
 const LOADING_MESSAGES = [
   'Your soundtrack is finding its shape',
@@ -224,16 +234,66 @@ export default function SoundtrackPage() {
   const hasFailed =
     status === 'failed' || status === 'canceled' || (error && !audioUrl);
 
-  const gradient = useMemo(() => gradientForSlug(id), [id]);
+  // Living background — same soundtrack always starts on the same gradient
+  // (deterministic from the slug so the OG image / initial paint is stable),
+  // then slowly cycles through a curated sequence every ~22 seconds. Combined
+  // with the ken-burns drift below, the page feels like it's breathing.
+  const startIdx = useMemo(() => gradientStartIndexForSlug(id), [id]);
+  const [cycleOffset, setCycleOffset] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCycleOffset((n) => n + 1);
+    }, GRADIENT_CYCLE_MS);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Rotate through a window of GRADIENT_CYCLE_LENGTH gradients starting at
+  // startIdx. Outer modulo wraps around the full GRADIENTS array so we don't
+  // read past the end.
+  const gradient =
+    GRADIENTS[
+      (startIdx + (cycleOffset % GRADIENT_CYCLE_LENGTH)) % GRADIENTS.length
+    ];
+  const nextGradientKey = `${id}-${cycleOffset}`;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20 relative overflow-hidden">
-      {/* Gradient background — deterministic from slug */}
+      {/* Living background — a slow crossfade between gradients plus a
+          subtle ken-burns drift (scale + translate) so the page never feels
+          static behind the record. Base ink layer is always present so we
+          never see a bare white flash between crossfades. */}
       <div className="fixed inset-0 pointer-events-none bg-ink" aria-hidden>
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${gradient})`, opacity: 0.45 }}
-        />
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={nextGradientKey}
+            initial={{ opacity: 0, scale: 1.06 }}
+            animate={{
+              opacity: 0.5,
+              scale: [1.06, 1.14, 1.06],
+              x: [0, 18, 0],
+              y: [0, -12, 0],
+            }}
+            exit={{ opacity: 0 }}
+            transition={{
+              opacity: { duration: 4, ease: 'easeInOut' },
+              scale: {
+                duration: GRADIENT_CYCLE_MS / 1000,
+                ease: 'easeInOut',
+              },
+              x: {
+                duration: GRADIENT_CYCLE_MS / 1000,
+                ease: 'easeInOut',
+              },
+              y: {
+                duration: GRADIENT_CYCLE_MS / 1000,
+                ease: 'easeInOut',
+              },
+            }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${gradient})` }}
+          />
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/45 to-ink/85" />
       </div>
       <SiteNav />
@@ -692,15 +752,13 @@ function CoverPlaceholder() {
 }
 
 // ---------------------------------------------------------------------------
-// LoadingRecord — a spinning vinyl standing in for the play button while
-// music is being generated. SVG (not photo) so it scales cleanly and the
-// centre label stays crisp. Real vinyl spins at 33⅓ RPM (1.8s per rotation);
-// we go slower at ~4s to feel meditative rather than urgent-loader-ish.
+// LoadingRecord — spinning vinyl + rotating loading messages. Stands in for
+// the play button while music is generating. The vinyl itself is the shared
+// <VinylRecord> component (also used on the questions page during submit).
 // ---------------------------------------------------------------------------
 
 function LoadingRecord() {
   const [idx, setIdx] = useState(0);
-  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -708,24 +766,6 @@ function LoadingRecord() {
     }, 3500);
     return () => clearInterval(interval);
   }, []);
-
-  // Groove rings — many concentric circles at slightly-varied opacities so
-  // the surface looks like real pressed vinyl instead of a flat black disc.
-  const grooves = Array.from({ length: 45 }, (_, i) => {
-    const r = 35 + i * 1.4;
-    const op = 0.025 + (i % 3 === 0 ? 0.02 : 0);
-    return (
-      <circle
-        key={i}
-        cx="100"
-        cy="100"
-        r={r}
-        fill="none"
-        stroke={`rgba(255,255,255,${op})`}
-        strokeWidth="0.35"
-      />
-    );
-  });
 
   return (
     <div className="text-center space-y-5 px-6">
@@ -744,104 +784,8 @@ function LoadingRecord() {
       </AnimatePresence>
 
       {/* Spinning vinyl */}
-      <div className="relative w-40 h-40 sm:w-44 sm:h-44 mx-auto">
-        <motion.svg
-          viewBox="0 0 200 200"
-          className="w-full h-full drop-shadow-[0_6px_28px_rgba(0,0,0,0.6)]"
-          animate={shouldReduceMotion ? undefined : { rotate: 360 }}
-          transition={
-            shouldReduceMotion
-              ? undefined
-              : { duration: 4, repeat: Infinity, ease: 'linear' }
-          }
-          aria-label="loading — a record is spinning"
-          role="img"
-        >
-          <defs>
-            <radialGradient id="vinylBase" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#16121a" />
-              <stop offset="60%" stopColor="#0c0a10" />
-              <stop offset="100%" stopColor="#06050a" />
-            </radialGradient>
-            <radialGradient id="vinylHighlight" cx="30%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="rgba(236,231,220,0.22)" />
-              <stop offset="35%" stopColor="rgba(236,231,220,0.06)" />
-              <stop offset="70%" stopColor="rgba(236,231,220,0)" />
-            </radialGradient>
-            <radialGradient id="vinylLabel" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#d4a865" />
-              <stop offset="85%" stopColor="#b18a3f" />
-              <stop offset="100%" stopColor="#8f6f2f" />
-            </radialGradient>
-          </defs>
-
-          {/* Base disc */}
-          <circle cx="100" cy="100" r="99" fill="url(#vinylBase)" />
-
-          {/* Concentric grooves */}
-          {grooves}
-
-          {/* Off-centre highlight sweep — this is what makes the spin visible.
-              A perfectly symmetric disc would look motionless even while
-              rotating. The highlight is asymmetric so the eye reads motion. */}
-          <circle cx="100" cy="100" r="99" fill="url(#vinylHighlight)" />
-
-          {/* Centre label */}
-          <circle cx="100" cy="100" r="30" fill="url(#vinylLabel)" />
-          <circle
-            cx="100"
-            cy="100"
-            r="30"
-            fill="none"
-            stroke="rgba(14,13,17,0.35)"
-            strokeWidth="0.4"
-          />
-          <circle
-            cx="100"
-            cy="100"
-            r="14"
-            fill="none"
-            stroke="rgba(14,13,17,0.22)"
-            strokeWidth="0.3"
-          />
-
-          {/* Label typography — italic serif top, small caps below */}
-          <text
-            x="100"
-            y="93"
-            textAnchor="middle"
-            fill="rgba(14,13,17,0.72)"
-            fontSize="5.2"
-            fontFamily="Georgia, 'Times New Roman', serif"
-            fontStyle="italic"
-          >
-            Soundtrack
-          </text>
-          <text
-            x="100"
-            y="100.5"
-            textAnchor="middle"
-            fill="rgba(14,13,17,0.55)"
-            fontSize="2.6"
-            fontFamily="ui-sans-serif, system-ui, sans-serif"
-            letterSpacing="0.6"
-          >
-            OF YOUR LIFE
-          </text>
-
-          {/* Centre spindle hole */}
-          <circle cx="100" cy="100" r="2.4" fill="#06050a" />
-
-          {/* Outer rim */}
-          <circle
-            cx="100"
-            cy="100"
-            r="99"
-            fill="none"
-            stroke="rgba(255,255,255,0.08)"
-            strokeWidth="0.5"
-          />
-        </motion.svg>
+      <div className="mx-auto">
+        <VinylRecord idSuffix="reveal" />
       </div>
 
       {/* Waiting note below the record */}

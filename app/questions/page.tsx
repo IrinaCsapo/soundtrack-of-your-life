@@ -6,6 +6,16 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { questions } from '@/lib/questions';
 import { GRADIENTS, gradientForStep } from '@/lib/gradients';
+import { VinylRecord } from '@/components/VinylRecord';
+
+// Loading messages cycled through while the create-soundtrack API call is in
+// flight. Same phrasing / rhythm as the reveal page so the transition into
+// /soundtrack/[slug] feels like one continuous loading experience.
+const SUBMIT_MESSAGES = [
+  'Sending your memory in',
+  'Warming up the record player',
+  'The music is finding you',
+];
 
 // Every free-text answer is stored with its first character capitalised.
 // Applied at input-onChange (not in the shared `update` fn) so chip picks —
@@ -153,7 +163,11 @@ export default function QuestionsPage() {
         </div>
       </header>
 
-      {/* Center: question (or moderation message when blocked) */}
+      {/* Center: question (or moderation message when blocked, or the
+          spinning-vinyl loading state while the create-soundtrack API is
+          in flight — that request is 4–6s of moderation + Claude metadata +
+          Replicate kickoff, and the previous "creating soundtrack…" button
+          text made the page look frozen). */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-32">
         {moderationMessage ? (
           <motion.div
@@ -172,6 +186,8 @@ export default function QuestionsPage() {
               try a different memory
             </button>
           </motion.div>
+        ) : submitting ? (
+          <SubmittingState />
         ) : (
         <div className="w-full max-w-2xl space-y-10">
           <AnimatePresence mode="wait">
@@ -403,6 +419,54 @@ function GenreSelector({
         </div>
       </div>
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// SubmittingState — vinyl loading UI shown while POST /api/generate is in
+// flight. Matches the reveal-page LoadingRecord so the transition into
+// /soundtrack/[slug] feels like one continuous loading moment rather than
+// "frozen questions page → new page".
+// ---------------------------------------------------------------------------
+
+function SubmittingState() {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIdx((i) => (i + 1) % SUBMIT_MESSAGES.length);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="text-center space-y-6"
+    >
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={idx}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 0.95, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="font-display italic text-xl sm:text-2xl text-paper leading-snug [text-shadow:0_2px_18px_rgba(0,0,0,0.7)]"
+        >
+          {SUBMIT_MESSAGES[idx]}
+        </motion.p>
+      </AnimatePresence>
+
+      <div className="mx-auto">
+        <VinylRecord idSuffix="submit" />
+      </div>
+
+      <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/55 max-w-[260px] mx-auto [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+        one moment
+      </p>
+    </motion.div>
   );
 }
 
