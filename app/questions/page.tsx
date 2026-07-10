@@ -7,6 +7,19 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { questions } from '@/lib/questions';
 import { GRADIENTS, gradientForStep } from '@/lib/gradients';
 
+// Every free-text answer is stored with its first character capitalised.
+// Applied at input-onChange (not in the shared `update` fn) so chip picks —
+// which are pre-formatted labels — stay untouched and the
+// options.includes(value) check in GenreSelector keeps working.
+function capitalizeFirst(s: string): string {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// Hard cap on free-text answers. Prevents essay-length paragraphs that look
+// bad in the reveal-page poem and shift the record layout on the album cover.
+const MAX_ANSWER_LENGTH = 60;
+
 export default function QuestionsPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -190,16 +203,36 @@ export default function QuestionsPage() {
                   placeholder={currentQuestion.placeholder}
                 />
               ) : (
-                <textarea
-                  ref={textareaRef}
-                  className="poetry-input"
-                  placeholder={currentQuestion.placeholder}
-                  value={currentAnswer}
-                  onChange={(e) => update(e.target.value)}
-                  onKeyDown={onKeyDown}
-                  rows={3}
-                  aria-label={currentQuestion.text}
-                />
+                <div className="space-y-1">
+                  <textarea
+                    ref={textareaRef}
+                    className="poetry-input"
+                    placeholder={currentQuestion.placeholder}
+                    value={currentAnswer}
+                    onChange={(e) =>
+                      update(capitalizeFirst(e.target.value))
+                    }
+                    onKeyDown={onKeyDown}
+                    rows={3}
+                    maxLength={MAX_ANSWER_LENGTH}
+                    aria-label={currentQuestion.text}
+                  />
+                  {/* Character counter — always mounted, dimmed while
+                      there's plenty of room, brass as the limit approaches.
+                      Rendering is unconditional so it doesn't shift layout. */}
+                  <p
+                    className={`text-right font-sans text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
+                      currentAnswer.length >= MAX_ANSWER_LENGTH
+                        ? 'text-brass'
+                        : currentAnswer.length >= 45
+                          ? 'text-paper/70'
+                          : 'text-paper/35'
+                    }`}
+                    aria-live="polite"
+                  >
+                    {currentAnswer.length} / {MAX_ANSWER_LENGTH}
+                  </p>
+                </div>
               )}
             </motion.div>
           </AnimatePresence>
@@ -228,8 +261,17 @@ export default function QuestionsPage() {
             </button>
           </div>
 
-          {currentQuestion.skippable && currentAnswer.trim().length === 0 && (
-            <p className="text-center font-sans text-[11px] tracking-[0.2em] uppercase text-paper/55 pt-2">
+          {/* Skip hint — kept mounted (visibility toggled with `invisible`)
+              so the vertically-centred flex column doesn't re-centre and
+              cause a jarring layout shift when a chip is tapped or the
+              user starts typing. */}
+          {currentQuestion.skippable && (
+            <p
+              className={`text-center font-sans text-[11px] tracking-[0.2em] uppercase text-paper/55 pt-2 ${
+                currentAnswer.trim().length === 0 ? '' : 'invisible'
+              }`}
+              aria-hidden={currentAnswer.trim().length !== 0}
+            >
               You can skip this one
             </p>
           )}
@@ -336,14 +378,29 @@ function GenreSelector({
         <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-paper/65">
           or write your own
         </p>
-        <input
-          type="text"
-          value={customText}
-          onChange={(e) => typeCustom(e.target.value)}
-          placeholder={placeholder}
-          aria-label="custom genre"
-          className="w-full max-w-sm text-center bg-transparent border-b border-paper/30 focus:border-brass text-paper font-serif italic placeholder:text-paper/45 placeholder:italic py-2 outline-none transition-colors duration-300"
-        />
+        <div className="w-full max-w-sm space-y-1">
+          <input
+            type="text"
+            value={customText}
+            onChange={(e) => typeCustom(capitalizeFirst(e.target.value))}
+            placeholder={placeholder}
+            aria-label="custom genre"
+            maxLength={MAX_ANSWER_LENGTH}
+            className="w-full text-center bg-transparent border-b border-paper/30 focus:border-brass text-paper font-serif italic placeholder:text-paper/45 placeholder:italic py-2 outline-none transition-colors duration-300"
+          />
+          <p
+            className={`text-right font-sans text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
+              customText.length >= MAX_ANSWER_LENGTH
+                ? 'text-brass'
+                : customText.length >= 45
+                  ? 'text-paper/70'
+                  : 'text-paper/35'
+            }`}
+            aria-live="polite"
+          >
+            {customText.length} / {MAX_ANSWER_LENGTH}
+          </p>
+        </div>
       </div>
     </div>
   );

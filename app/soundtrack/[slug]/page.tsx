@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { AnimatePresence, motion, type Variants } from 'framer-motion';
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type Variants,
+} from 'framer-motion';
 import { SiteNav } from '@/components/SiteNav';
 import { GRADIENTS } from '@/lib/gradients';
 
@@ -279,9 +284,14 @@ export default function SoundtrackPage() {
             </AnimatePresence>
 
             {answers?.q4 && (
-              <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-brass/90 [text-shadow:0_2px_12px_rgba(0,0,0,0.6)]">
-                {answers.q4}
-              </p>
+              <div className="flex justify-center pt-1">
+                <span
+                  className="inline-flex items-center rounded-full border border-brass/50 bg-ink/25 backdrop-blur-sm px-4 py-1.5 font-serif italic text-sm text-brass/95 [text-shadow:0_2px_10px_rgba(0,0,0,0.55)]"
+                  aria-label="chosen genre"
+                >
+                  {answers.q4.charAt(0).toUpperCase() + answers.q4.slice(1)}
+                </span>
+              </div>
             )}
           </motion.div>
 
@@ -299,13 +309,16 @@ export default function SoundtrackPage() {
             />
           </motion.div>
 
-          {/* Poem (skip q4 — that's the genre) */}
+          {/* Poem (skip q4 — that's the genre, and q5 mood which is context
+              for the music, not text meant to appear on the reveal page).
+              Tightened spacing — space-y-2 between lines and leading-[1.35]
+              inside — so it reads as a stanza rather than a bulleted list. */}
           {answers && (
             <motion.div
               variants={poemVariants}
               initial="hidden"
               animate="visible"
-              className="space-y-5 pb-10"
+              className="space-y-2 pb-10"
             >
               {Object.entries(answers)
                 .filter(
@@ -315,7 +328,7 @@ export default function SoundtrackPage() {
                   <motion.p
                     key={key}
                     variants={lineVariants}
-                    className="font-serif italic text-paper/90 text-base leading-[1.7] [text-shadow:0_2px_18px_rgba(0,0,0,0.6)]"
+                    className="font-serif italic text-paper/90 text-base leading-[1.35] [text-shadow:0_2px_18px_rgba(0,0,0,0.6)]"
                   >
                     {value}
                   </motion.p>
@@ -659,7 +672,7 @@ function CoverWithPlayer({
             )}
           </motion.button>
         ) : musicLoading ? (
-          <LoadingPulse />
+          <LoadingRecord />
         ) : null}
       </div>
     </div>
@@ -678,8 +691,16 @@ function CoverPlaceholder() {
   );
 }
 
-function LoadingPulse() {
+// ---------------------------------------------------------------------------
+// LoadingRecord — a spinning vinyl standing in for the play button while
+// music is being generated. SVG (not photo) so it scales cleanly and the
+// centre label stays crisp. Real vinyl spins at 33⅓ RPM (1.8s per rotation);
+// we go slower at ~4s to feel meditative rather than urgent-loader-ish.
+// ---------------------------------------------------------------------------
+
+function LoadingRecord() {
   const [idx, setIdx] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -688,8 +709,27 @@ function LoadingPulse() {
     return () => clearInterval(interval);
   }, []);
 
+  // Groove rings — many concentric circles at slightly-varied opacities so
+  // the surface looks like real pressed vinyl instead of a flat black disc.
+  const grooves = Array.from({ length: 45 }, (_, i) => {
+    const r = 35 + i * 1.4;
+    const op = 0.025 + (i % 3 === 0 ? 0.02 : 0);
+    return (
+      <circle
+        key={i}
+        cx="100"
+        cy="100"
+        r={r}
+        fill="none"
+        stroke={`rgba(255,255,255,${op})`}
+        strokeWidth="0.35"
+      />
+    );
+  });
+
   return (
-    <div className="text-center space-y-7 px-6">
+    <div className="text-center space-y-5 px-6">
+      {/* Rotating loading message above the record */}
       <AnimatePresence mode="wait">
         <motion.p
           key={idx}
@@ -703,37 +743,109 @@ function LoadingPulse() {
         </motion.p>
       </AnimatePresence>
 
-      {/* Triple-ripple pulse */}
-      <div className="relative w-14 h-14 mx-auto">
-        <motion.span
-          animate={{ scale: [1, 2.4, 1], opacity: [0.5, 0, 0.5] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
-          className="absolute inset-0 rounded-full border border-brass"
-          aria-hidden
-        />
-        <motion.span
-          animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0.05, 0.6] }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: 'easeOut',
-            delay: 0.6,
-          }}
-          className="absolute inset-0 rounded-full border border-brass/70"
-          aria-hidden
-        />
-        <motion.span
-          animate={{
-            scale: [0.85, 1.15, 0.85],
-            opacity: [0.85, 0.55, 0.85],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-[18px] rounded-full bg-brass/50"
-          aria-hidden
-        />
+      {/* Spinning vinyl */}
+      <div className="relative w-40 h-40 sm:w-44 sm:h-44 mx-auto">
+        <motion.svg
+          viewBox="0 0 200 200"
+          className="w-full h-full drop-shadow-[0_6px_28px_rgba(0,0,0,0.6)]"
+          animate={shouldReduceMotion ? undefined : { rotate: 360 }}
+          transition={
+            shouldReduceMotion
+              ? undefined
+              : { duration: 4, repeat: Infinity, ease: 'linear' }
+          }
+          aria-label="loading — a record is spinning"
+          role="img"
+        >
+          <defs>
+            <radialGradient id="vinylBase" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#16121a" />
+              <stop offset="60%" stopColor="#0c0a10" />
+              <stop offset="100%" stopColor="#06050a" />
+            </radialGradient>
+            <radialGradient id="vinylHighlight" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="rgba(236,231,220,0.22)" />
+              <stop offset="35%" stopColor="rgba(236,231,220,0.06)" />
+              <stop offset="70%" stopColor="rgba(236,231,220,0)" />
+            </radialGradient>
+            <radialGradient id="vinylLabel" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#d4a865" />
+              <stop offset="85%" stopColor="#b18a3f" />
+              <stop offset="100%" stopColor="#8f6f2f" />
+            </radialGradient>
+          </defs>
+
+          {/* Base disc */}
+          <circle cx="100" cy="100" r="99" fill="url(#vinylBase)" />
+
+          {/* Concentric grooves */}
+          {grooves}
+
+          {/* Off-centre highlight sweep — this is what makes the spin visible.
+              A perfectly symmetric disc would look motionless even while
+              rotating. The highlight is asymmetric so the eye reads motion. */}
+          <circle cx="100" cy="100" r="99" fill="url(#vinylHighlight)" />
+
+          {/* Centre label */}
+          <circle cx="100" cy="100" r="30" fill="url(#vinylLabel)" />
+          <circle
+            cx="100"
+            cy="100"
+            r="30"
+            fill="none"
+            stroke="rgba(14,13,17,0.35)"
+            strokeWidth="0.4"
+          />
+          <circle
+            cx="100"
+            cy="100"
+            r="14"
+            fill="none"
+            stroke="rgba(14,13,17,0.22)"
+            strokeWidth="0.3"
+          />
+
+          {/* Label typography — italic serif top, small caps below */}
+          <text
+            x="100"
+            y="93"
+            textAnchor="middle"
+            fill="rgba(14,13,17,0.72)"
+            fontSize="5.2"
+            fontFamily="Georgia, 'Times New Roman', serif"
+            fontStyle="italic"
+          >
+            Soundtrack
+          </text>
+          <text
+            x="100"
+            y="100.5"
+            textAnchor="middle"
+            fill="rgba(14,13,17,0.55)"
+            fontSize="2.6"
+            fontFamily="ui-sans-serif, system-ui, sans-serif"
+            letterSpacing="0.6"
+          >
+            OF YOUR LIFE
+          </text>
+
+          {/* Centre spindle hole */}
+          <circle cx="100" cy="100" r="2.4" fill="#06050a" />
+
+          {/* Outer rim */}
+          <circle
+            cx="100"
+            cy="100"
+            r="99"
+            fill="none"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth="0.5"
+          />
+        </motion.svg>
       </div>
 
-      <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/60 leading-relaxed max-w-[260px] mx-auto pt-2 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+      {/* Waiting note below the record */}
+      <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/60 leading-relaxed max-w-[260px] mx-auto [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
         this can take a minute or two — keep this tab open
       </p>
     </div>
