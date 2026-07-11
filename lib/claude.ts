@@ -113,17 +113,19 @@ The VISUAL prompt direction below is for ALBUM COVER IMAGES ONLY — do NOT let 
 ═══════════════════════════════════════════════════════════════
 
 CORE MEDIUM (CONSTANT ACROSS EVERY COVER — do NOT skip this):
-The cover is ALWAYS a MIXED-MEDIA COLLAGE ALBUM ART piece SET ON A LIGHT CREAM / OFF-WHITE TORN PAPER GROUND. Every cover uses TORN PAPER edges dividing or overlaying the composition, LAYERED photographic fragments, HAND-DRAWN brush strokes and gestural marks, occasional GOLD-LEAF or metallic-ink accents and spatter, DISTRESSED edges, HALFTONE / SCREENPRINT textures. Hand-designed feel like an independent label record sleeve, NOT digital-clean, NOT a straight photograph.
+The cover is ALWAYS a MIXED-MEDIA COLLAGE ALBUM ART piece structured as a MULTI-PANEL LAYERED TORN-PAPER COMPOSITION — typically 2–3 vertical or horizontal panels of DIFFERENT MATERIALS torn and stacked side by side. Each panel is a distinct element with its own texture: often ONE cream / warm paper panel (carrying brush strokes or gestural marks), ONE atmospheric photographic panel (dim interior, moody figure, coloured light), and ONE painterly wash or colour-block panel (deep purple wash, wine red, dusty rose, etc.). GOLD-LEAF and metallic-ink SPATTER accents scattered like stars across the panels. HAND-DRAWN brush strokes and gestural marks flowing between panels. Torn paper edges VISIBLE between panels. Halftone / screenprint textures. Hand-designed feel like an independent label record sleeve, NOT a single centred photograph with a paper frame.
 
-The MEDIUM (collage on light paper ground) is constant. The GENRE below determines what CONTENT and PALETTE goes into the collage. The MOMENT provides specific personal hooks (a colour, an object, a texture from the user's memory).
+Think of the composition like the Cocteau Twins, 4AD, and independent-label multi-panel sleeve tradition — layered, fragmented, moody, rich. NOT a single photo pasted onto a cream background. Cream / warm paper is ONE panel among the composition, NOT the entire ground.
 
-PROMPT STRUCTURE — construct the Flux prompt in this exact order to prevent Flux from over-weighting dark or dim content:
-  1. FIRST: "Mixed-media collage album cover on cream torn paper ground, hand-designed like an independent record label sleeve."
-  2. THEN: light-forward palette (put warm/cream/light colours FIRST, dark accents LAST)
-  3. THEN: genre-specific content as photographic fragments layered on the paper ground
-  4. THEN: hand-drawn brush strokes, gold-leaf accents, halftone/screenprint textures
-  5. THEN: 1–2 named reference album covers (from the list below)
-  6. LAST: any darker atmospheric qualities (film noir shadow, cigarette smoke, dim interior) — these must ALWAYS be BALANCED by warm light bleeding through torn edges or a bright cream paper background so the overall image never reads as mostly-black.
+The MEDIUM (multi-panel torn collage) is constant. The GENRE below determines the PALETTE and the CONTENT of each panel. The MOMENT provides specific personal hooks (a colour, an object, a texture from the user's memory).
+
+PROMPT STRUCTURE — construct the Flux prompt in this exact order:
+  1. FIRST: "Multi-panel torn paper collage album cover with 2–3 vertical layered panels of different materials, hand-designed like an independent record label sleeve."
+  2. THEN: describe each panel — one panel is often cream/warm paper with hand-drawn brush strokes; one panel carries an atmospheric photographic fragment matching the genre content (moody light, a hand, a room, a silhouette); a third panel may carry a coloured wash or painterly block.
+  3. THEN: genre palette — a mix of light AND rich/moody colours together, both must be present so the composition has depth and contrast side by side.
+  4. THEN: gold-leaf metallic spatter accents scattered like stars, hand-drawn ink brush strokes flowing between panels, halftone/screenprint textures on the paper.
+  5. THEN: 1–2 named reference album covers (from the list below).
+  6. LAST: the composition should feel LAYERED, FRAGMENTED, and RICH — not clean, centred, or photographic.
 
 REFERENCE ALBUM COVERS to draw the collage aesthetic from (rotate 1–2 per generation for archive diversity):
 - alt-J "This Is All Yours" — thick painterly bold colour blocking with gestural brush marks
@@ -142,55 +144,55 @@ Additional aesthetic vocabulary: risograph print, screenprint, cassette culture,
 
 Pick the recipe matching q4, and describe the collage AS a collage containing those elements.
 
-Each palette below is written LIGHT-FIRST — always foreground the lighter colours in the Flux prompt so the base of the composition reads bright, with darker colours as accents inside the collage.
+Each palette below is BALANCED — both rich moody colours AND a cream/warm-paper counterpoint should appear in the composition. The moody colours can carry the atmospheric panels; the cream paper anchors one panel with brush strokes.
 
 ——— midnight jazz collage ———
-Palette (light-first): CREAM torn paper ground, warm amber light, gold-leaf accents, tobacco brown, deep blue accents, ink black only as accent on silhouettes.
-Content in the collage: partial brass instrument silhouettes (trumpet or saxophone) visible through torn paper cutouts, warm amber club light bleeding through torn cream-paper edges, small fragments of dim interior architecture, cigarette-smoke wisps as subtle texture (NOT filling the frame).
+Palette (balanced): deep blue and tobacco brown atmospheric panels, cream paper panel with hand-drawn brush strokes, warm amber club light glow, gold-leaf metallic spatter accents.
+Panel content: one atmospheric photographic panel of a dim jazz interior with warm amber light (brass instrument silhouette, or a hand at a piano, or smoke curling in a beam of light); one cream paper panel with hand-drawn ink brush strokes and gold spatter; one deep-blue or tobacco-brown wash panel.
 Design language references: Blue Note album cover typography and duotone photography (Reid Miles influence), Verve compilation aesthetic.
-Textural additions: warm film grain, large-scale halftone dots on the cream ground, gold-leaf brush accents.
+Textural additions: warm film grain, large-scale halftone dots, gold-leaf brush accents scattered like stars across panels.
 
 ——— velvet ambient collage ———
-Palette (light-first): warm cream, soft amber, dusty rose, muted ochre, sage accents.
-Content in the collage: photographic fragments of sunlit curtains, a steaming cup, textural fabric, sunset windows, gestural warm-ochre brush strokes across the cream ground.
+Palette (balanced): warm cream and soft amber panels, dusty rose and muted ochre atmospheric wash, sage accents, gold-leaf spatter.
+Panel content: one warm sunlit photographic panel (sunlit curtains, steaming cup, textural fabric); one cream paper panel with gestural warm-ochre brush strokes; one dusty-rose or ochre wash panel.
 Design language references: 4AD sleeves (Vaughan Oliver), Kompakt ambient covers, warm ochre-toned indie compilation art.
-Textural additions: soft film grain, warm haze, gold-leaf brushstroke accents, torn cream paper strips.
+Textural additions: soft film grain, warm haze, gold-leaf brushstroke accents scattered across panels.
 
 ——— dreamy shoegaze collage ———
-Palette (light-first): cream ground, mint, dusty pink, faded blue, coral, hot pink accents.
-Content in the collage: blurred photographic fragments of figures or objects torn and layered on the cream ground, motion-blur streaks, chromatic aberration on the torn paper edges, distant soft silhouettes, blown-out light fragments.
+Palette (balanced): cream paper panel + moody dusty pink, faded blue, mint, coral wash panels, hot pink accents, occasional deep atmospheric panel.
+Panel content: one atmospheric blurred photographic panel (soft-focus figure, blown-out light, chromatic bloom); one cream paper panel with pale hand-painted washes; one dusty-pink or faded-blue wash panel.
 Design language references: Cocteau Twins 4AD covers (Vaughan Oliver), Slowdive covers, Beach House sleeves.
 Textural additions: heavy halation, warm chromatic bloom, screenprint mist, hand-painted paper strips.
 
 ——— psychedelic chillwave collage ———
-Palette (light-first): cream torn paper ground, sunset orange, hot pink, electric blue, neon purple accents, chrome silver highlights.
-Content in the collage: retro sunset-gradient photographic fragments as torn strips on cream ground, palm silhouettes, 80s TV static as ribbons, geometric grid overlays, small VHS glitch bars, chrome accents.
+Palette (balanced): cream paper panel + retro sunset gradient panel + neon accents (hot pink, electric blue, sunset orange, neon purple), chrome silver highlights.
+Panel content: one atmospheric sunset gradient panel (palm silhouettes, retro pool tiles, ocean sunset); one cream paper panel with hand-drawn geometric marks; one VHS-static or gradient panel with neon accents.
 Design language references: vaporwave graphic design, Boards of Canada album art, Miami Vice palette, Nation of Language sleeves.
 Textural additions: VHS scanlines through torn strips, chromatic aberration on cutouts, neon glow, holographic foil accents.
 
 ——— haunted piano collage ———
-Palette (light-first): cream torn paper ground dominates, cold slate blue accents, warm amber accent, ink black only for a single brush stroke or piano silhouette.
-Content in the collage: sparse composition on generous cream paper ground — torn photograph fragments of an empty room, upright piano silhouette in one corner, an open-window fragment, cold sidelight, one hand-drawn ink brush stroke.
+Palette (balanced): cream paper panel dominates, cold slate blue atmospheric panel, deep ink black accent, single warm amber accent, silver-leaf spatter.
+Panel content: one sparse cream paper panel with generous negative space and a single hand-drawn ink brush stroke; one cold-blue atmospheric panel (empty room, upright piano silhouette, open window); one deep-ink accent panel or ink-black brush stroke across the composition.
 Design language references: Ólafur Arnalds Re:member cover, Nils Frahm Solo cover, ECM records minimalism, Erased Tapes label design.
-Textural additions: quiet high-contrast grain on the cream ground, generous negative space, minimal composition, ink brush accents.
+Textural additions: quiet high-contrast grain, generous negative space, minimal composition, ink brush accents.
 
 ——— forgotten radio collage ———
-Palette (light-first): cream / faded off-white paper ground, dusty ochre, warm yellow, faded orange, mustard, muted brown accents.
-Content in the collage: torn Polaroid fragments layered on the cream ground, old radio dial photograph fragments, cassette tape ephemera, faded photograph edges, dust motes, sepia-toned strips.
+Palette (balanced): faded cream paper panel + dusty ochre and muted brown atmospheric panels, warm yellow, faded orange accents.
+Panel content: one atmospheric sepia-toned panel (old radio dial, cassette tapes, dust motes, faded photograph); one cream/faded paper panel with tape-damage edges; one warm-yellow or dusty-ochre wash panel.
 Design language references: Ghost Box records, Boards of Canada album art, 70s Polaroid palette, Trunk records.
 Textural additions: yellowed paper edges, tape damage, worn corners, halftone print, warm yellowed gel overlay.
 
 ——— distorted lullaby collage ———
-Palette (light-first): pale cream / off-white torn paper ground, pale yellow, faded pink, warped magenta accents, ink black only as accent glitch marks.
-Content in the collage: warped childhood photograph fragments (dolls, blankets, soft toys) torn and layered on cream paper, torn edges with tape-warp glitches, half-obscured images, hand-drawn crayon glitch marks.
+Palette (balanced): pale cream paper panel + moody warped panels with pale yellow, faded pink, warped magenta, ink black accents.
+Panel content: one warped photographic panel (childhood objects — dolls, blankets — tape-warped and half-obscured); one pale cream paper panel with hand-drawn crayon glitch marks; one wash panel with unexpected colour bleed.
 Design language references: Grouper covers, Broadcast on Warp records, Boards of Canada.
 Textural additions: distortion, tape warp, damaged photograph edges, gestural crayon or hand-drawn ink marks.
 
 ——— crystalline drone collage ———
-Palette (light-first): cream / ice-white paper ground, prismatic rainbows, silver, cold blue accents.
-Content in the collage: prismatic light photography fragments torn into strips on cream ground, crystal and glass silhouettes, geometric shapes, refractive edges, ice photograph fragments.
+Palette (balanced): cream paper panel + prismatic rainbow refractions, silver, cold blue atmospheric wash, ice-white accents.
+Panel content: one prismatic light photographic panel (crystal, glass, refractive edges); one cream/ice-white paper panel with silver-leaf accents; one cold-blue wash panel with geometric shapes.
 Design language references: Ryuichi Sakamoto async, Editions Mego covers, Kompakt Total series.
-Textural additions: sharp clean torn edges, high-key light, sparse composition, silver-leaf accents.
+Textural additions: sharp clean torn edges, high-key light, sparse composition, silver-leaf accents scattered like stars.
 
 ——— custom / skipped q4 ———
 If user typed their own q4 term, choose the closest visual world above OR blend two. If q4 was skipped entirely, default to velvet ambient collage.
@@ -203,12 +205,13 @@ CRITICALLY — ALSO MINE THE USER'S ANSWERS to personalise the collage:
 COMPOSITION NOTE: the collage should feel HAND-COMPOSED — layers overlapping, torn edges VISIBLE, one strong focal point, plenty of textural variety. Include some negative or quieter space so the composition breathes. NOT symmetrical, NOT digitally clean.
 
 STRICTLY AVOID:
-- MOSTLY-DARK OR BLACK IMAGES. The composition must ALWAYS have a bright cream / warm-paper ground reading through the torn edges and negative space. Every cover MUST be readable as a light-based collage with dark accents, NOT a dark image with light accents. If you find your prompt describing lots of "dim", "shadow", "silhouette", "black", "smoke", "dark" without an equal number of "cream paper", "warm light", "amber glow", "gold leaf", "bright", "cream ground" — REBALANCE before returning.
-- Descriptive photography with NO collage treatment — every cover MUST have visible torn paper edges, layered elements, and hand-drawn marks or graphic overlays. If it looks like a straight photograph, you failed.
-- ANY readable text, letterforms, or Japanese/Asian calligraphy in the image — Flux garbles text, and non-Latin calligraphy makes the cover feel culturally specific when the music isn't. Hand-drawn abstract brush strokes and gestural marks ARE welcome; calligraphic characters are NOT.
+- SINGLE CENTRED PHOTO ON A PAPER BACKGROUND. This is the most common failure mode — Flux takes "collage on cream paper" and produces one photograph pasted onto a cream frame. Every cover MUST be a MULTI-PANEL torn composition with at least 2–3 distinct panels of different materials side by side. If you find your prompt describing "a photograph on a cream paper background" instead of "torn panels of different materials", REBALANCE before returning.
+- FULLY-BLACK IMAGES WITH NO COUNTERPOINT. Moody, atmospheric, deep-toned panels (dim interiors, purple washes, night scenes) are welcome and desired — but there must ALWAYS be at least ONE cream/warm paper panel OR bright element (gold spatter, warm light, cream brush strokes) somewhere in the composition to give the eye a place to rest and contrast to breathe. Rich moody depth = good. Uniform black square = failure.
+- Descriptive photography with NO collage treatment — every cover MUST have visible torn paper edges between panels, layered elements, and hand-drawn marks or graphic overlays.
+- ANY readable text, letterforms, or Japanese/Asian calligraphy in the image — Flux garbles text, and non-Latin calligraphy makes the cover feel culturally specific when the music isn't. Hand-drawn abstract brush strokes and gestural ink marks ARE welcome; calligraphic characters are NOT.
 - Clean digital vector illustration
 - Photorealistic faces or portraits
-- Muted-only palettes; the collage should have colour contrast
+- Muted-only palettes with no contrast
 - Generic AI-abstract-art washes with no compositional structure
 - Foggy misty landscapes with no collage treatment
 
