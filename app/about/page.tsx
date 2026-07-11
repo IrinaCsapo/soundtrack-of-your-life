@@ -28,7 +28,7 @@ export default function AboutPage() {
             about
           </p>
           <h1 className="font-display wonk text-5xl sm:text-6xl text-paper italic leading-tight">
-            this small thing
+            This small thing
           </h1>
         </header>
 
