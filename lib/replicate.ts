@@ -9,27 +9,23 @@ export const replicate = new Replicate({
 });
 
 // ---------------------------------------------------------------------------
-// Music model — MusicGen stereo-large at 15 seconds
+// Music model — MusicGen stereo-large at 30 seconds
 //
-// Target: sub-60s generation. MusicGen scales roughly linearly with duration,
-// so 30s (~90–120s gen) → 15s (~45–60s gen). Tight but hits the target.
+// 15s was too short for a piece to develop (jazz especially wants breathing
+// room). Back at 30s — ~90–120s generation time, but the finished track has
+// enough space to actually feel like a song rather than a snippet.
 //
-// 15s is short for a fully-developed piece (jazz especially wants space to
-// breathe), but the tradeoff is faster iteration for the user. If quality
-// suffers noticeably we switch models — Stable Audio Open 1.0
-// (`stackadoc/stable-audio-open-1.0`) reliably generates a 30-second clip in
-// ~15–30s, with tighter genre response than MusicGen at short durations.
-//
-// Other levers if 15s @ stereo-large isn't fast enough:
-//   - model_version: 'large' — mono, ~10–15% faster
-//   - MUSIC_MODEL: 'stackadoc/stable-audio-open-1.0'
+// If speed becomes a priority again, the two levers are:
+//   - model_version: 'large' — mono, ~10–15% faster than stereo-large
+//   - MUSIC_MODEL: 'stackadoc/stable-audio-open-1.0' — ~15–30s per gen for
+//     30s output, with tighter genre response than MusicGen
 // ---------------------------------------------------------------------------
 
 export const MUSIC_MODEL = 'meta/musicgen';
 
 export const MUSIC_INPUT_DEFAULTS = {
   model_version: 'stereo-large' as const,
-  duration: 15,
+  duration: 30,
   output_format: 'mp3' as const,
   normalization_strategy: 'loudness' as const,
 };

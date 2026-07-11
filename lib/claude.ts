@@ -112,80 +112,96 @@ The VISUAL prompt direction below is for ALBUM COVER IMAGES ONLY — do NOT let 
 2. COVER ART PROMPT — for Flux (text-to-image model), square 1:1
 ═══════════════════════════════════════════════════════════════
 
-The cover should reflect BOTH the specific moment described (draw colours/objects/textures from the user's answers) AND the visual world of the chosen GENRE. Genre gives the aesthetic universe; the moment personalises it.
+CORE MEDIUM (CONSTANT ACROSS EVERY COVER — do NOT skip this):
+The cover is ALWAYS a MIXED-MEDIA COLLAGE ALBUM ART piece. Every cover uses TORN PAPER edges dividing or overlaying the composition, LAYERED photographic fragments, HAND-DRAWN brush strokes and gestural marks, occasional GOLD-LEAF or metallic-ink accents and spatter, DISTRESSED edges, HALFTONE / SCREENPRINT textures. Hand-designed feel like an independent label record sleeve, NOT digital-clean, NOT a straight photograph.
 
-GENRE VISUAL WORLDS — pick the one that matches q4:
+The MEDIUM (collage) is constant. The GENRE below determines what CONTENT and PALETTE goes into the collage. The MOMENT provides specific personal hooks (a colour, an object, a texture from the user's memory).
 
-──── midnight jazz cover ────
-References: Blue Note album covers (Reid Miles typography and duotone photography), Kind of Blue sleeve, film noir photography, jazz café interiors, Bill Evans covers.
-Palette: deep blues, warm ambers, tobacco brown, cream, black.
-Elements: brass instruments partially visible, dim interior architecture, cigarette smoke as texture, urban night, jazz club shadows, warm amber light through smoke.
-Textural: high-contrast duotone photography, film noir shadows, warm film grain.
+REFERENCE ALBUM COVERS to draw the collage aesthetic from (rotate 1–2 per generation for archive diversity):
+- alt-J "This Is All Yours" — thick painterly bold colour blocking with gestural brush marks
+- The Chemical Brothers "Surrender" — high-contrast duotone concert photography, colour-treated
+- Marley Carroll "Flight Patterns" — atmospheric dotted/stippled halftone textures forming shapes
+- James K "Hyacinth" — magazine-style photographic collage with sparkles, layered overlays, scattered graphic fragments
+- My Friend x Tommy Farrow "Forget Nothing EP" — torn paper collage with organic blue/orange shapes on cream ground
+- 18 Carat Affair "Spent Passions 2" — vaporwave neon glitch with gradient elements
+- There's Talk — photographic collage torn and geometrically arranged with graphic circles, halftone stripes, gradient blocks
+- Acid Jazz "Chronic Trax Vol 1" — retro '90s compilation, distressed vinyl aesthetic
+- 4AD / Ninja Tune / Blue Note / Kompakt independent label sleeves
 
-──── velvet ambient cover ────
-References: 4AD sleeves, soft photographic collage, atmospheric abstraction, sun-lit interior photography.
+Additional aesthetic vocabulary: risograph print, screenprint, cassette culture, 90s zine, retro club flyer, distressed collage, gold-leaf brush accents, gold spatter, layered translucent papers, hand-torn cream paper strips.
+
+──── GENRE-SPECIFIC CONTENT + PALETTE for the collage ────
+
+Pick the recipe matching q4, and describe the collage AS a collage containing those elements.
+
+——— midnight jazz collage ———
+Content in the collage: brass instrument silhouettes (trumpet, saxophone) partially visible through torn paper, dim jazz club interior fragments, cigarette smoke as texture drifting across the composition, warm amber light bleeding through torn edges, film noir photographic strips.
+Palette: deep blue, warm amber, tobacco brown, cream, ink black.
+Design language references: Blue Note album cover typography and duotone photography (Reid Miles influence), Verve compilation aesthetic.
+Textural additions: film noir grain, large-scale halftone dots, warm film photography with high contrast, gold-leaf accents on cream torn paper.
+
+——— velvet ambient collage ———
+Content in the collage: photographic fragments of curtains catching sunlight, steaming cup, warm interiors, textural fabric, sunset windows, gestural warm-ochre brush strokes across the composition.
 Palette: warm cream, dusty rose, muted ochre, soft amber, sage.
-Elements: curtains catching light, steam, textural fabric, sunset windows, textural photographic fragments from the user's memory.
-Textural: film grain, soft focus, warm haze.
+Design language references: 4AD sleeves (Vaughan Oliver), Kompakt ambient covers, warm ochre-toned indie compilation art.
+Textural additions: soft film grain, warm haze, gold-leaf brushstroke accents, torn cream paper strips.
 
-──── dreamy shoegaze cover ────
-References: Cocteau Twins 4AD covers (Vaughan Oliver design), blown-out photography, blurred motion, chromatic bloom.
-Palette: washed pastels — mint, dusty pink, cream, faded blue, coral.
-Elements: soft-focus figures/objects, blurred edges everywhere, chromatic aberration, motion streaks.
-Textural: heavy halation, warm bloom, chromatic bloom around highlights.
+——— dreamy shoegaze collage ———
+Content in the collage: blurred photographic figures/objects torn and layered, motion-blur streaks, chromatic aberration on torn edges, distant silhouettes, blown-out light fragments.
+Palette: washed pastels — mint, dusty pink, cream, faded blue, coral, hot pink accents.
+Design language references: Cocteau Twins 4AD covers (Vaughan Oliver), Slowdive covers, Beach House sleeves.
+Textural additions: heavy halation, warm chromatic bloom, screenprint mist, hand-painted paper strips.
 
-──── psychedelic chillwave cover ────
-References: vaporwave art, retro sunset gradients, 80s TV static, palm silhouettes, Miami Vice, Boards of Canada album art.
-Palette: hot pink, electric blue, sunset orange, neon purple, magenta.
-Elements: sun setting into ocean, palm silhouettes, retro pool tiles, geometric grids, gradient skies.
-Textural: VHS scanlines, chromatic aberration, neon glow, chrome type.
+——— psychedelic chillwave collage ———
+Content in the collage: retro sunset gradient fragments as torn strips, palm silhouettes, 80s TV static torn into ribbons, geometric grids overlaid, VHS glitch bars, chrome accents.
+Palette: hot pink, electric blue, sunset orange, neon purple, magenta, chrome silver.
+Design language references: vaporwave graphic design, Boards of Canada album art, Miami Vice palette, Nation of Language sleeves.
+Textural additions: VHS scanlines through torn strips, chromatic aberration on cutouts, neon glow, holographic foil accents.
 
-──── haunted piano cover ────
-References: sparse minimalist album covers (Ólafur Arnalds Re:member, Nils Frahm Solo), empty-room photography, single-subject compositions, cold interiors.
-Palette: cold slate blue, near-black, single warm accent, silver, ink.
-Elements: empty room, single object (upright piano, chair, open window), long shadows, cold sidelight.
-Textural: high contrast, negative space, quiet grain.
+——— haunted piano collage ———
+Content in the collage: torn photographs of empty rooms, upright piano silhouette, an open window fragment, cold sidelight bleeding through torn edges, long shadow textures, single hand-drawn ink brush stroke.
+Palette: cold slate blue, near-black, ink, cream torn paper, single warm amber accent.
+Design language references: Ólafur Arnalds Re:member cover, Nils Frahm Solo cover, ECM records minimalism, Erased Tapes label design.
+Textural additions: high-contrast quiet grain, generous negative space, minimal composition, ink brush accents.
 
-──── forgotten radio cover ────
-References: vintage radio dial photography, cassette culture, faded Polaroids, Boards of Canada album art, 70s Polaroid palette.
-Palette: faded sepia, dusty ochre, muted brown, cream, faded orange.
-Elements: old radio dial, cassette tapes, half-torn Polaroids, faded photographs, dust motes.
-Textural: yellowed, warm, worn, tape damage.
+——— forgotten radio collage ———
+Content in the collage: torn Polaroid fragments layered, old radio dial photographs, cassette tape ephemera, faded photograph edges, dust motes, sepia-toned photographic strips.
+Palette: faded sepia, dusty ochre, muted brown, cream, faded orange, mustard.
+Design language references: Ghost Box records, Boards of Canada album art, 70s Polaroid palette, Trunk records.
+Textural additions: yellowed paper edges, tape damage, worn corners, halftone print, warm yellowed gel overlay.
 
-──── distorted lullaby cover ────
-References: warped photography, childhood imagery half-obscured, Grouper covers, tape damage aesthetic.
-Palette: muted with colour bleeds — pale yellow, faded pink, ink black, warped magenta.
-Elements: old childhood objects (dolls, blankets, soft toys), faded photographs, warped textures, hand-drawn glitch marks.
-Textural: distortion, tape warp, damaged photograph edges.
+——— distorted lullaby collage ———
+Content in the collage: warped childhood photograph fragments (dolls, blankets, soft toys) torn and layered, torn edges with tape-warp glitches, half-obscured images, hand-drawn crayon glitch marks.
+Palette: muted base with unexpected colour bleeds — pale yellow, faded pink, ink black, warped magenta.
+Design language references: Grouper covers, Broadcast on Warp records, Boards of Canada.
+Textural additions: distortion, tape warp, damaged photograph edges, gestural crayon or hand-drawn ink marks.
 
-──── crystalline drone cover ────
-References: Ryuichi Sakamoto async album art, prismatic light photography, minimalist geometric composition, glass sculpture.
-Palette: cold blues, prismatic rainbows on white ground, silver, ice.
-Elements: light through crystal, geometric shapes, refractive edges, ice/glass.
-Textural: sharp, clean, sparse, high-key light.
+——— crystalline drone collage ———
+Content in the collage: prismatic light photography fragments torn into strips, crystal and glass silhouettes, geometric shapes, refractive edges, ice photograph fragments.
+Palette: cold blues, prismatic rainbows on cream ground, silver, ice white.
+Design language references: Ryuichi Sakamoto async, Editions Mego covers, Kompakt Total series.
+Textural additions: sharp clean torn edges, high-key light, sparse composition, silver-leaf accents.
 
-──── custom / no genre ────
-If user typed their own q4 term, choose the closest visual world above OR blend two. If q4 was skipped, use velvet ambient.
+——— custom / skipped q4 ———
+If user typed their own q4 term, choose the closest visual world above OR blend two. If q4 was skipped entirely, default to velvet ambient collage.
 
-CRITICALLY — ALSO MINE THE USER'S ANSWERS to personalise the genre visual world:
+CRITICALLY — ALSO MINE THE USER'S ANSWERS to personalise the collage:
 - Extract 2–3 SPECIFIC COLOURS the user mentioned (or that their scene implies) and use them WITHIN the genre palette
-- Extract 1–2 SPECIFIC OBJECTS/TEXTURES they mentioned and include as photographic collage fragments in the composition
-- Extract atmospheric qualities (rain, wind, warmth, cold) and translate to visual textures (grain, blur, glow, shadow)
+- Extract 1–2 SPECIFIC OBJECTS/TEXTURES they mentioned and include as torn photographic fragments in the collage composition (a kettle, a road, a hand, curtains, a laptop, a window, a sky)
+- Extract atmospheric qualities (rain, wind, warmth, cold) and translate to collage textures (film grain, blur, glow, brush marks, torn edges, distressed layers)
 
-The cover should feel like it was designed for THEIR memory, IN THE VISUAL LANGUAGE of the genre they picked.
-
-COMPOSITION NOTE: leave some negative or quieter space somewhere in the frame — a solid colour block, an area of quiet paint, empty photographic sky. Composition should breathe.
+COMPOSITION NOTE: the collage should feel HAND-COMPOSED — layers overlapping, torn edges VISIBLE, one strong focal point, plenty of textural variety. Include some negative or quieter space so the composition breathes. NOT symmetrical, NOT digitally clean.
 
 STRICTLY AVOID:
-- Any readable text or letterforms in the image (Flux garbles text — NO titles, artist names, words, or lettering of any kind)
-- Generic AI-abstract-art with no reference to the memory or genre
-- Foggy misty landscape defaults
-- Japanese calligraphy / Asian scripts unless the user's memory explicitly evoked them
+- Descriptive photography with NO collage treatment — every cover MUST have visible torn paper edges, layered elements, and hand-drawn marks or graphic overlays. If it looks like a straight photograph, you failed.
+- ANY readable text, letterforms, or Japanese/Asian calligraphy in the image — Flux garbles text, and non-Latin calligraphy makes the cover feel culturally specific when the music isn't. Hand-drawn abstract brush strokes and gestural marks ARE welcome; calligraphic characters are NOT.
+- Clean digital vector illustration
 - Photorealistic faces or portraits
-- Cute illustration, vector art, geometric perfection
-- Watercolour dreamy washes with no clear subject
+- Muted-only palettes; the collage should have colour contrast
+- Generic AI-abstract-art washes with no compositional structure
+- Foggy misty landscapes with no collage treatment
 
-Should feel like: A record sleeve you'd flip past in a small independent vinyl shop and pull out to look closer. Hand-designed, mixing photography and graphic marks, matching the genre. Personal, curated. Distinctly NOT generic AI art.
+Should feel like: A record sleeve you'd flip past in a small independent vinyl shop and pull out to look closer. Hand-designed collage, mixing torn photography, layered paper, brush strokes, and graphic marks. Personal to the memory, matched to the genre. Distinctly NOT a stock photograph.
 
 ═══════════════════════════════════════════════════════════════
 3. TITLES
