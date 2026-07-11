@@ -716,13 +716,25 @@ function CoverWithPlayer({
 
 function CoverPlaceholder() {
   return (
-    <motion.div
-      initial={{ opacity: 0.5 }}
-      animate={{ opacity: [0.4, 0.7, 0.4] }}
-      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      className="absolute inset-0 bg-gradient-to-br from-warmth via-ink to-warmth"
-      aria-hidden
-    />
+    <>
+      {/* Cream paper ground — matches the "cover on cream torn paper" spec
+          in the visual prompt so a missing / still-generating cover reads
+          as a paper waiting for its collage, not as a broken black square. */}
+      <motion.div
+        initial={{ opacity: 0.9 }}
+        animate={{ opacity: [0.85, 1, 0.85] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute inset-0 bg-gradient-to-br from-warmth via-paper/70 to-warmth"
+        aria-hidden
+      />
+      {/* Tiny "cover forming" label so a slow / failed cover reads as an
+          intentional wait rather than a hole in the design. */}
+      <div className="absolute inset-x-0 bottom-6 text-center pointer-events-none">
+        <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-ink/50">
+          cover finding its shape
+        </p>
+      </div>
+    </>
   );
 }
 
