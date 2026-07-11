@@ -103,6 +103,7 @@ export default function SoundtrackPage() {
   const id = params.slug;
 
   const [status, setStatus] = useState<Status>('starting');
+  const [coverStatus, setCoverStatus] = useState<Status>('starting');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [titles, setTitles] = useState<string[]>([]);
@@ -126,6 +127,7 @@ export default function SoundtrackPage() {
         if (cancelled) return;
 
         setStatus(data.status ?? 'unknown');
+        setCoverStatus(data.coverStatus ?? 'unknown');
         if (data.audioUrl) setAudioUrl(data.audioUrl);
         if (data.coverUrl) setCoverUrl(data.coverUrl);
         if (Array.isArray(data.titles)) setTitles(data.titles);
@@ -361,6 +363,9 @@ export default function SoundtrackPage() {
           >
             <CoverWithPlayer
               coverUrl={coverUrl}
+              coverFailed={
+                coverStatus === 'failed' || coverStatus === 'canceled'
+              }
               audioUrl={audioUrl}
               musicReady={musicReady}
               musicLoading={musicLoading}
@@ -477,12 +482,14 @@ export default function SoundtrackPage() {
 
 function CoverWithPlayer({
   coverUrl,
+  coverFailed,
   audioUrl,
   musicReady,
   musicLoading,
   title,
 }: {
   coverUrl: string | null;
+  coverFailed: boolean;
   audioUrl: string | null;
   musicReady: boolean;
   musicLoading: boolean;
@@ -623,19 +630,26 @@ function CoverWithPlayer({
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <CoverPlaceholder />
+            <CoverPlaceholder failed={coverFailed} />
           )}
         </AnimatePresence>
 
-        {/* Centered vignette so the play button is always readable */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle at center, rgba(14,13,17,0.55) 0%, rgba(14,13,17,0.15) 35%, rgba(14,13,17,0) 60%)',
-          }}
-          aria-hidden
-        />
+        {/* Centered vignette so the play button is always readable —
+            only applied when a real cover image is behind it. On the cream
+            placeholder we skip it so the loading card stays clearly light
+            (otherwise the 55% dark radial makes the centre look nearly
+            black, which is what caused the "cover reverted to black"
+            confusion). */}
+        {coverUrl && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle at center, rgba(14,13,17,0.55) 0%, rgba(14,13,17,0.15) 35%, rgba(14,13,17,0) 60%)',
+            }}
+            aria-hidden
+          />
+        )}
       </div>
 
       {/* Play / pause button */}
@@ -714,24 +728,29 @@ function CoverWithPlayer({
   );
 }
 
-function CoverPlaceholder() {
+function CoverPlaceholder({ failed = false }: { failed?: boolean }) {
   return (
     <>
       {/* Cream paper ground — matches the "cover on cream torn paper" spec
           in the visual prompt so a missing / still-generating cover reads
-          as a paper waiting for its collage, not as a broken black square. */}
+          as a paper waiting for its collage, not as a broken dark square.
+          Uses `paper` (#ECE7DC, cream) as base with a subtle brass shimmer
+          through the middle. */}
       <motion.div
         initial={{ opacity: 0.9 }}
-        animate={{ opacity: [0.85, 1, 0.85] }}
+        animate={{ opacity: [0.9, 1, 0.9] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute inset-0 bg-gradient-to-br from-warmth via-paper/70 to-warmth"
+        className="absolute inset-0 bg-gradient-to-br from-paper via-brass/25 to-paper"
         aria-hidden
       />
-      {/* Tiny "cover forming" label so a slow / failed cover reads as an
-          intentional wait rather than a hole in the design. */}
+      {/* Loading vs failed label — makes it obvious what state we're in
+          rather than showing the same "forming" message forever if Flux
+          actually errored. */}
       <div className="absolute inset-x-0 bottom-6 text-center pointer-events-none">
-        <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-ink/50">
-          cover finding its shape
+        <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-ink/55">
+          {failed
+            ? 'the cover got lost on the way'
+            : 'cover finding its shape'}
         </p>
       </div>
     </>
