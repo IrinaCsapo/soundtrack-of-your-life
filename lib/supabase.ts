@@ -32,4 +32,12 @@ export type SoundtrackRow = {
   is_public: boolean;
   shared_at: string | null;
   created_at: string;
+
+  // Extension feature — "Keep it going" appends 30s continuation segments
+  // to music_urls up to 120s total. music_url stays the original for
+  // backwards compat; music_urls holds the full ordered playback list.
+  music_urls: string[];
+  music_duration: number;
+  extension_replicate_id: string | null;
+  extension_status: string;
 };

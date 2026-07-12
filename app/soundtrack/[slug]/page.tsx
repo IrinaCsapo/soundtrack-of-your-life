@@ -128,6 +128,16 @@ export default function SoundtrackPage() {
   const [answers, setAnswers] = useState<Record<string, string> | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Extension state — ordered list of URLs for sequential playback plus the
+  // current total duration and pending-extension flag. The user "keeps it
+  // going" by clicking a button that fires POST /extend; polling picks up
+  // the new segment as it succeeds.
+  const [musicUrls, setMusicUrls] = useState<string[]>([]);
+  const [musicDuration, setMusicDuration] = useState<number>(30);
+  const [extensionStatus, setExtensionStatus] = useState<string>('idle');
+  const [extending, setExtending] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
+
   const [shuffling, setShuffling] = useState(false);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -152,12 +162,39 @@ export default function SoundtrackPage() {
         if (data.answers) setAnswers(data.answers);
         if (data.error) setError(String(data.error));
 
-        // Keep polling while music or cover is still working
+        // Extension bookkeeping. musicUrls is the ordered playback list;
+        // extensionStatus tells us if a "Keep it going" is in flight.
+        if (Array.isArray(data.musicUrls) && data.musicUrls.length > 0) {
+          setMusicUrls(data.musicUrls);
+        }
+        if (typeof data.musicDuration === 'number') {
+          setMusicDuration(data.musicDuration);
+        }
+        if (typeof data.extensionStatus === 'string') {
+          setExtensionStatus(data.extensionStatus);
+          // Auto-clear the local "extending" flag once the server confirms
+          // the extension finished (succeeded or failed).
+          if (
+            data.extensionStatus === 'succeeded' ||
+            data.extensionStatus === 'failed' ||
+            data.extensionStatus === 'canceled'
+          ) {
+            setExtending(false);
+          }
+        }
+
+        // Keep polling while music, cover, OR an extension is in flight
         const musicWorking =
           data.status === 'starting' || data.status === 'processing';
         const coverWorking =
           data.coverStatus === 'starting' || data.coverStatus === 'processing';
-        if ((musicWorking || coverWorking) && !cancelled) {
+        const extensionWorking =
+          data.extensionStatus === 'starting' ||
+          data.extensionStatus === 'processing';
+        if (
+          (musicWorking || coverWorking || extensionWorking) &&
+          !cancelled
+        ) {
           timer = setTimeout(poll, 2000);
         }
       } catch {
@@ -170,7 +207,11 @@ export default function SoundtrackPage() {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [id]);
+    // `extending` is a dep so the poll loop restarts when the user clicks
+    // "Keep it going" after the initial music/cover generation already
+    // finished. The loop reads fresh data each cycle and stops itself when
+    // nothing is in flight, so this is idempotent.
+  }, [id, extending]);
 
   const pickTitle = useCallback(
     async (title: string) => {
@@ -206,6 +247,34 @@ export default function SoundtrackPage() {
       setShuffling(false);
     }
   }, [answers, shuffling]);
+
+  // "Keep it going" — fires a continuation prediction on the server. We flip
+  // the local `extending` flag immediately for optimistic UI, then the poll
+  // picks up the new segment as it becomes available (see the poll effect).
+  const handleExtend = useCallback(async () => {
+    if (extending) return;
+    if (musicDuration >= 120) return;
+    setExtending(true);
+    // Optimistically move status forward so the poll loop keeps running
+    // until the real Replicate status comes back.
+    setExtensionStatus('starting');
+    try {
+      const res = await fetch(`/api/soundtrack/${id}/extend`, {
+        method: 'POST',
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error('[extend] failed:', data);
+        setExtending(false);
+        setExtensionStatus('failed');
+        return;
+      }
+    } catch (err) {
+      console.error('[extend] request failed:', err);
+      setExtending(false);
+      setExtensionStatus('failed');
+    }
+  }, [extending, musicDuration, id]);
 
   async function downloadAudio() {
     if (!audioUrl || downloading) return;
@@ -442,10 +511,19 @@ export default function SoundtrackPage() {
               coverFailed={
                 coverStatus === 'failed' || coverStatus === 'canceled'
               }
-              audioUrl={audioUrl}
+              // Fall back to the single audioUrl if the DB hasn't caught up
+              // to storing music_urls yet (backwards compat for old rows).
+              musicUrls={
+                musicUrls.length > 0
+                  ? musicUrls
+                  : audioUrl
+                    ? [audioUrl]
+                    : []
+              }
               musicReady={musicReady}
               musicLoading={musicLoading}
               title={selectedTitle || titles[0] || 'a soundtrack'}
+              onPlaybackStart={() => setHasPlayed(true)}
             />
           </motion.div>
 
@@ -475,6 +553,38 @@ export default function SoundtrackPage() {
                 ))}
             </motion.div>
           )}
+
+          {/* "Keep it going" moment — a distinct pill above the standard
+              actions row. Appears only once the user has actually pressed
+              play (earning the option rather than surfacing it upfront) and
+              hides once the track is at full 120s length. */}
+          <AnimatePresence>
+            {hasPlayed && musicReady && (
+              <motion.div
+                key="keep-going-row"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="flex flex-col items-center gap-2 pt-2 pb-6"
+              >
+                <KeepItGoingButton
+                  musicDuration={musicDuration}
+                  extending={
+                    extending ||
+                    extensionStatus === 'starting' ||
+                    extensionStatus === 'processing'
+                  }
+                  atMax={musicDuration >= 120}
+                  onExtend={handleExtend}
+                />
+                {/* Small caption below showing current duration + max. */}
+                <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-paper/45 [text-shadow:0_2px_10px_rgba(0,0,0,0.7)]">
+                  {formatSeconds(musicDuration)} / 2:00
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Actions — three pills side-by-side on desktop, stacked on
               mobile. `whitespace-nowrap` on each pill so heavily-tracked
@@ -559,34 +669,73 @@ export default function SoundtrackPage() {
 function CoverWithPlayer({
   coverUrl,
   coverFailed,
-  audioUrl,
+  musicUrls,
   musicReady,
   musicLoading,
   title,
+  onPlaybackStart,
 }: {
   coverUrl: string | null;
   coverFailed: boolean;
-  audioUrl: string | null;
+  /** Ordered playback list — index 0 is the original 30s track, subsequent
+   *  entries are 30s "Keep it going" continuations. Playback advances
+   *  through them sequentially with the audio element. */
+  musicUrls: string[];
   musicReady: boolean;
   musicLoading: boolean;
   title: string;
+  /** Called the first time the user hits play. The parent uses this to
+   *  reveal the "Keep it going" pill — earning it rather than showing it
+   *  the moment music arrives. */
+  onPlaybackStart?: () => void;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [currentSegment, setCurrentSegment] = useState(0);
+  // segmentTime = current time within the currently-playing segment, in
+  // seconds. We use it (plus the played-through segment count) to compute
+  // combined progress across the whole extended track.
+  const [segmentTime, setSegmentTime] = useState(0);
+
+  // Current URL is whichever segment we're pointed at. If musicUrls hasn't
+  // arrived yet (shouldn't happen when musicReady is true, but defensive),
+  // fall back to null and the audio element renders empty.
+  const currentUrl: string | null = musicUrls[currentSegment] ?? null;
+  const totalSegments = musicUrls.length;
+  const assumedSegmentSeconds = 30;
+
+  // Combined progress across the whole extended track — smooth ring even
+  // as we transition between segments.
+  const progress =
+    totalSegments > 0
+      ? Math.min(
+          1,
+          (currentSegment * assumedSegmentSeconds + segmentTime) /
+            (totalSegments * assumedSegmentSeconds)
+        )
+      : 0;
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     function onTime() {
-      if (audio && audio.duration && !isNaN(audio.duration)) {
-        setProgress(audio.currentTime / audio.duration);
+      if (audio && !isNaN(audio.currentTime)) {
+        setSegmentTime(audio.currentTime);
       }
     }
     function onEnded() {
-      setPlaying(false);
-      setProgress(1);
+      // Sequential playback — hop to the next segment if there is one,
+      // otherwise stop and pin progress to 100%.
+      if (currentSegment + 1 < musicUrls.length) {
+        setCurrentSegment(currentSegment + 1);
+        setSegmentTime(0);
+        // The [currentSegment, currentUrl] effect below will load + play
+        // the next URL now that state has advanced.
+      } else {
+        setPlaying(false);
+        setSegmentTime(assumedSegmentSeconds);
+      }
     }
     audio.addEventListener('timeupdate', onTime);
     audio.addEventListener('ended', onEnded);
@@ -594,7 +743,24 @@ function CoverWithPlayer({
       audio.removeEventListener('timeupdate', onTime);
       audio.removeEventListener('ended', onEnded);
     };
-  }, [audioUrl]);
+  }, [currentSegment, musicUrls, currentUrl]);
+
+  // When currentSegment changes, load the new URL and — if we were mid-
+  // playback — auto-continue playing so the transition feels seamless.
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentUrl) return;
+    if (audio.src !== currentUrl) {
+      audio.src = currentUrl;
+      // Only auto-play if we're already in a playing state (i.e. we
+      // transitioned from segment N ending → segment N+1 starting).
+      if (playing) {
+        audio.play().catch(() => {
+          /* autoplay blocked — user will need to tap play */
+        });
+      }
+    }
+  }, [currentUrl, playing]);
 
   // ---------------------------------------------------------------------------
   // MediaSession — populate the iOS/Android lock-screen / Control Center player
@@ -604,7 +770,7 @@ function CoverWithPlayer({
     if (
       typeof navigator === 'undefined' ||
       !('mediaSession' in navigator) ||
-      !audioUrl
+      !currentUrl
     ) {
       return;
     }
@@ -625,7 +791,7 @@ function CoverWithPlayer({
       // Older browsers / unsupported environments — non-fatal
       console.warn('MediaSession metadata failed:', err);
     }
-  }, [audioUrl, coverUrl, title]);
+  }, [currentUrl, coverUrl, title]);
 
   useEffect(() => {
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) {
@@ -672,8 +838,22 @@ function CoverWithPlayer({
     const audio = audioRef.current;
     if (!audio) return;
     if (audio.paused) {
-      audio.play();
+      // If we finished the last segment previously and the user hits play
+      // again, restart from segment 0. This also handles the initial-play
+      // case when the src was set but currentTime is 0.
+      if (currentSegment >= musicUrls.length - 1 && audio.ended) {
+        setCurrentSegment(0);
+        setSegmentTime(0);
+        audio.src = musicUrls[0] ?? '';
+        audio.currentTime = 0;
+      }
+      audio.play().catch(() => {
+        /* autoplay blocked — user needs to interact */
+      });
       setPlaying(true);
+      // Notify the parent the first time playback starts so it can reveal
+      // the "Keep it going" pill — earning it, not gifting it.
+      onPlaybackStart?.();
     } else {
       audio.pause();
       setPlaying(false);
@@ -689,8 +869,11 @@ function CoverWithPlayer({
 
   return (
     <div className="relative w-72 h-72 sm:w-80 sm:h-80">
-      {/* Audio element */}
-      {audioUrl && <audio ref={audioRef} src={audioUrl} preload="auto" />}
+      {/* Audio element — only src'd once we have at least one URL. Sequential
+          playback swaps this element's src to the next URL on `ended`. */}
+      {currentUrl && (
+        <audio ref={audioRef} src={currentUrl} preload="auto" />
+      )}
 
       {/* Cover image */}
       <div className="absolute inset-0 rounded-sm overflow-hidden bg-warmth shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
@@ -730,7 +913,7 @@ function CoverWithPlayer({
 
       {/* Play / pause button */}
       <div className="absolute inset-0 flex items-center justify-center">
-        {musicReady && audioUrl ? (
+        {musicReady && currentUrl ? (
           <motion.button
             onClick={toggle}
             whileTap={{ scale: 0.96 }}
@@ -901,6 +1084,74 @@ function LoadingPulse() {
           the LoadingPulse and above the cover box in the parent page. */}
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// KeepItGoingButton — the "extend this track" pill. Shown to the user once
+// they've actually pressed play on the current version, hidden once they've
+// hit the 120-second cap. Fires POST /api/soundtrack/[id]/extend via the
+// onExtend callback, which the parent uses to flip its extending flag and
+// restart the polling loop.
+// ---------------------------------------------------------------------------
+
+function KeepItGoingButton({
+  musicDuration,
+  extending,
+  atMax,
+  onExtend,
+}: {
+  musicDuration: number;
+  extending: boolean;
+  atMax: boolean;
+  onExtend: () => void;
+}) {
+  if (atMax) {
+    // At full length — the button transforms into a quiet marker rather
+    // than disappearing entirely, so the user has feedback that they've
+    // reached the ceiling.
+    return (
+      <span className="inline-flex items-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-brass/70 border border-brass/30 px-7 py-3 rounded-full bg-ink/25">
+        full length reached · 2:00
+      </span>
+    );
+  }
+
+  return (
+    <button
+      onClick={onExtend}
+      disabled={extending}
+      className="relative inline-flex items-center justify-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-brass border border-brass/60 hover:border-brass hover:text-brass hover:bg-brass/10 transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30 disabled:opacity-70 disabled:cursor-wait"
+      aria-label={
+        extending ? 'extending soundtrack' : 'extend soundtrack by 30 seconds'
+      }
+    >
+      {extending ? (
+        <span className="flex items-center gap-3">
+          {/* Small brass pulse dot signals live work — subtler than a
+              spinner, matches the site's Cabinet quiet aesthetic. */}
+          <motion.span
+            animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-1.5 h-1.5 rounded-full bg-brass"
+            aria-hidden
+          />
+          extending
+        </span>
+      ) : (
+        'keep it going'
+      )}
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Format seconds as m:ss for the duration caption ("0:30 / 2:00").
+// ---------------------------------------------------------------------------
+
+function formatSeconds(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 // ---------------------------------------------------------------------------

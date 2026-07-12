@@ -44,11 +44,19 @@ export async function GET(
   // Track what we should persist after returning
   let pendingMusicPersist: string | null = null;
   let pendingCoverPersist: string | null = null;
+  let pendingExtensionPersist: string | null = null;
 
   let musicStatus = record.music_status;
   let musicUrl: string | null = record.music_url;
   let coverStatus = record.cover_status;
   let coverUrl: string | null = record.cover_url;
+  let extensionStatus: string = record.extension_status ?? 'idle';
+  let musicUrls: string[] = Array.isArray(record.music_urls)
+    ? record.music_urls
+    : record.music_url
+      ? [record.music_url]
+      : [];
+  let musicDuration: number = record.music_duration ?? 30;
 
   // ------ Music ----------------------------------------------------------
   if (musicStatus !== 'succeeded' && record.music_replicate_id) {
@@ -79,6 +87,49 @@ export async function GET(
       }
     } catch (err) {
       console.error('[status] music check error:', err);
+    }
+  }
+
+  // ------ Extension -----------------------------------------------------
+  // "Keep it going" extensions poll here alongside music + cover. When the
+  // continuation prediction succeeds we return the temp Replicate URL
+  // immediately so the client can start playing it, then persist to
+  // Supabase Storage in the background (same pattern as music/cover).
+  if (
+    record.extension_replicate_id &&
+    extensionStatus !== 'succeeded' &&
+    extensionStatus !== 'failed' &&
+    extensionStatus !== 'canceled'
+  ) {
+    try {
+      const prediction = await replicate.predictions.get(
+        record.extension_replicate_id
+      );
+      extensionStatus = prediction.status;
+
+      if (prediction.status === 'succeeded') {
+        const tempUrl = unwrapOutput(prediction.output);
+        if (typeof tempUrl === 'string') {
+          // Return the extended URL immediately so the client can start
+          // sequential playback; persistence happens in the background.
+          musicUrls = [...musicUrls, tempUrl];
+          musicDuration = musicDuration + 30;
+          pendingExtensionPersist = tempUrl;
+        }
+      } else if (
+        prediction.status === 'failed' ||
+        prediction.status === 'canceled'
+      ) {
+        await supabaseAdmin
+          .from('soundtracks')
+          .update({
+            extension_status: prediction.status,
+            extension_replicate_id: null,
+          })
+          .eq('id', id);
+      }
+    } catch (err) {
+      console.error('[status] extension check error:', err);
     }
   }
 
@@ -113,9 +164,18 @@ export async function GET(
   }
 
   // Schedule background persistence — runs after we return the response
-  if (pendingMusicPersist || pendingCoverPersist) {
+  if (
+    pendingMusicPersist ||
+    pendingCoverPersist ||
+    pendingExtensionPersist
+  ) {
     const musicSource = pendingMusicPersist;
     const coverSource = pendingCoverPersist;
+    const extensionSource = pendingExtensionPersist;
+    // Snapshot the final urls array + duration for the update below so we
+    // don't race with any newer state that might be written in parallel.
+    const finalMusicUrls = musicUrls;
+    const finalMusicDuration = musicDuration;
     after(async () => {
       try {
         if (musicSource) {
@@ -127,9 +187,19 @@ export async function GET(
             'audio/mpeg'
           );
           if (persistedUrl) {
+            // The original track is both music_url (backwards-compat) and
+            // the first entry in music_urls (sequential playback).
+            const newMusicUrls =
+              finalMusicUrls.length > 0
+                ? [persistedUrl, ...finalMusicUrls.slice(1)]
+                : [persistedUrl];
             await supabaseAdmin
               .from('soundtracks')
-              .update({ music_url: persistedUrl, music_status: 'succeeded' })
+              .update({
+                music_url: persistedUrl,
+                music_urls: newMusicUrls,
+                music_status: 'succeeded',
+              })
               .eq('id', id);
           }
         }
@@ -148,6 +218,49 @@ export async function GET(
               .eq('id', id);
           }
         }
+        if (extensionSource) {
+          // Re-fetch the current row so we don't clobber other segments
+          // that may have been persisted since we captured state above.
+          const { data: fresh } = await supabaseAdmin
+            .from('soundtracks')
+            .select('music_urls, music_duration')
+            .eq('id', id)
+            .single();
+          const existingUrls: string[] = Array.isArray(fresh?.music_urls)
+            ? fresh!.music_urls
+            : [];
+          // Segment index is 1-based (0 = original). Filename encodes it
+          // so we don't collide when a user extends the same track twice.
+          const segmentIndex = Math.max(
+            1,
+            (fresh?.music_duration ?? finalMusicDuration) / 30 - 1
+          );
+          const persistedUrl = await persistAsset(
+            extensionSource,
+            AUDIO_BUCKET,
+            `${id}-ext-${segmentIndex}`,
+            'mp3',
+            'audio/mpeg'
+          );
+          if (persistedUrl) {
+            // Replace the temp URL (last entry, since we appended it in
+            // the extension check above) with the persisted one.
+            const withoutTemp =
+              existingUrls.length > 0
+                ? existingUrls.filter((u) => u !== extensionSource)
+                : [];
+            const nextUrls = [...withoutTemp, persistedUrl];
+            await supabaseAdmin
+              .from('soundtracks')
+              .update({
+                music_urls: nextUrls,
+                music_duration: nextUrls.length * 30,
+                extension_status: 'succeeded',
+                extension_replicate_id: null,
+              })
+              .eq('id', id);
+          }
+        }
       } catch (err) {
         console.error('[status] background persist error:', err);
       }
@@ -158,9 +271,15 @@ export async function GET(
     // Backward-compatible fields used by the reveal page
     status: musicStatus,
     audioUrl: musicUrl,
-    // New cover fields
+    // Cover
     coverStatus,
     coverUrl,
+    // Extension — full ordered URL list for sequential playback plus the
+    // current total duration and pending-extension status so the client can
+    // decide whether to show "Keep it going" as ready / extending / capped.
+    musicUrls,
+    musicDuration,
+    extensionStatus,
     // Persisted data the reveal page renders
     titles: record.titles ?? [],
     selectedTitle: record.selected_title,
