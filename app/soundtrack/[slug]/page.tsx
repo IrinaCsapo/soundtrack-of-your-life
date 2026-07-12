@@ -8,6 +8,7 @@ import {
   type Variants,
 } from 'framer-motion';
 import { SiteNav } from '@/components/SiteNav';
+import { AnimatedBlobs } from '@/components/AnimatedBlobs';
 import { GRADIENTS } from '@/lib/gradients';
 
 /** Deterministic gradient START index from the soundtrack slug — the reveal
@@ -404,7 +405,17 @@ export default function SoundtrackPage() {
             style={{ backgroundImage: `url(${gradient})` }}
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/45 to-ink/85" />
+
+        {/* Ondulating colour blobs — hot pink, orange-red, deep violet —
+            layered over Fabiana's gradient with plus-lighter blend so they
+            glow through like flames behind fabric. This is what makes the
+            page feel alive rather than static-with-slow-crossfade. */}
+        <AnimatedBlobs />
+
+        {/* Darkening gradient for text readability. Slightly softened
+            (was from-ink/70 → from-ink/55) so the blobs breathe through
+            more visibly at the top and bottom of the frame. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/25 to-ink/70" />
       </div>
       <SiteNav />
       {hasFailed ? (
