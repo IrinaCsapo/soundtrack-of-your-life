@@ -8,7 +8,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export const maxDuration = 30;
 
-const MAX_DURATION_SECONDS = 120;
+const MAX_DURATION_SECONDS = 60;
 const EXTENSION_INCREMENT = 30;
 
 /**
@@ -16,10 +16,10 @@ const EXTENSION_INCREMENT = 30;
  *
  * "Keep it going" — fires a MusicGen continuation prediction to extend the
  * soundtrack by 30 seconds. Uses the last URL in `music_urls` as the input
- * audio so each extension continues from wherever the last one left off,
- * preserving the musical thread the user already fell in love with.
+ * audio so the continuation preserves the musical thread the user already
+ * fell in love with.
  *
- * Caps total playback at 120 seconds (3 extensions from a 30s original).
+ * MVP cap: 60 seconds total (one extension click from the 30s original).
  * Rejects duplicate requests while an extension is already in flight.
  */
 export async function POST(

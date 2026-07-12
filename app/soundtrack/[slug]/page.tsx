@@ -184,7 +184,12 @@ export default function SoundtrackPage() {
           }
         }
 
-        // Keep polling while music, cover, OR an extension is in flight
+        // Keep polling while music, cover, OR an extension is in flight.
+        // We also keep polling while the LOCAL `extending` flag is true
+        // (captured from closure at the time this effect ran) — this covers
+        // the race where the poll fires before POST /extend has finished
+        // writing extension_status: 'starting' to the DB. Without this, the
+        // poll would see 'idle', stop, and the button would hang forever.
         const musicWorking =
           data.status === 'starting' || data.status === 'processing';
         const coverWorking =
@@ -193,7 +198,7 @@ export default function SoundtrackPage() {
           data.extensionStatus === 'starting' ||
           data.extensionStatus === 'processing';
         if (
-          (musicWorking || coverWorking || extensionWorking) &&
+          (musicWorking || coverWorking || extensionWorking || extending) &&
           !cancelled
         ) {
           timer = setTimeout(poll, 2000);
@@ -252,9 +257,10 @@ export default function SoundtrackPage() {
   // "Keep it going" — fires a continuation prediction on the server. We flip
   // the local `extending` flag immediately for optimistic UI, then the poll
   // picks up the new segment as it becomes available (see the poll effect).
+  // MVP cap is 60 seconds — one extension click, keeping the wait bounded.
   const handleExtend = useCallback(async () => {
     if (extending) return;
-    if (musicDuration >= 120) return;
+    if (musicDuration >= 60) return;
     setExtending(true);
     // Optimistically move status forward so the poll loop keeps running
     // until the real Replicate status comes back.
@@ -586,12 +592,12 @@ export default function SoundtrackPage() {
                     extensionStatus === 'starting' ||
                     extensionStatus === 'processing'
                   }
-                  atMax={musicDuration >= 120}
+                  atMax={musicDuration >= 60}
                   onExtend={handleExtend}
                 />
                 {/* Small caption below showing current duration + max. */}
                 <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-paper/45 [text-shadow:0_2px_10px_rgba(0,0,0,0.7)]">
-                  {formatSeconds(musicDuration)} / 2:00
+                  {formatSeconds(musicDuration)} / 1:00
                 </p>
               </motion.div>
             )}
@@ -1122,7 +1128,7 @@ function KeepItGoingButton({
     // reached the ceiling.
     return (
       <span className="inline-flex items-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-brass/70 border border-brass/30 px-7 py-3 rounded-full bg-ink/25">
-        full length reached · 2:00
+        full length reached · 1:00
       </span>
     );
   }
