@@ -30,13 +30,17 @@ async function getPublicSoundtracks(): Promise<ArchiveItem[]> {
 
   return data.map((s) => {
     const answers = (s.answers ?? {}) as Record<string, string>;
+    const rawTitle: string =
+      s.selected_title ||
+      (Array.isArray(s.titles) && s.titles.length > 0
+        ? s.titles[0]
+        : 'untitled');
+    // Titles are stored lowercase in the Cabinet voice; capitalise the
+    // first letter for card display so they read as proper titles.
+    const title = rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
     return {
       id: s.id,
-      title:
-        s.selected_title ||
-        (Array.isArray(s.titles) && s.titles.length > 0
-          ? s.titles[0]
-          : 'untitled'),
+      title,
       coverUrl: s.cover_url,
       genre: answers.q4 || null,
     };

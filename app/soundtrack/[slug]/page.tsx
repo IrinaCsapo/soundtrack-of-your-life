@@ -31,6 +31,23 @@ const GRADIENT_CYCLE_LENGTH = 4;
 /** Ms between gradient crossfades. Slow enough to breathe, not distracting. */
 const GRADIENT_CYCLE_MS = 22_000;
 
+/** Capitalise the first character of a string. Used to display track titles
+ *  (stored lowercase in Cabinet voice) as sentence-case H1s. */
+function capitalizeFirst(s: string): string {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Fake progress ramp so the user sees numeric progression while music is
+ *  generating. Replicate doesn't expose real progress percentages for
+ *  MusicGen, so we ease from 5% → 90% over ~100 seconds (the empirical
+ *  average generation time), then hold at 90% until the music actually
+ *  arrives, at which point the caller sets progress to 100. This is
+ *  cosmetic — the goal is a sense of forward motion, not accuracy. */
+const PROGRESS_TARGET_MS = 100_000;
+const PROGRESS_START = 5;
+const PROGRESS_HOLD = 90;
+
 const LOADING_MESSAGES = [
   'Your soundtrack is finding its shape',
   'Stitching the memory into music',
@@ -249,6 +266,29 @@ export default function SoundtrackPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fake progress % while music is generating. Ramps from 5→90 over ~100s,
+  // holds at 90 until the real music succeeds, then jumps to 100.
+  const [mountTime] = useState(() => Date.now());
+  const [progress, setProgress] = useState(PROGRESS_START);
+
+  useEffect(() => {
+    if (musicReady) {
+      setProgress(100);
+      return;
+    }
+    if (!musicLoading) return;
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - mountTime;
+      const ratio = Math.min(1, elapsed / PROGRESS_TARGET_MS);
+      const next = Math.round(
+        PROGRESS_START + (PROGRESS_HOLD - PROGRESS_START) * ratio
+      );
+      setProgress(next);
+    }, 500);
+    return () => clearInterval(interval);
+  }, [musicLoading, musicReady, mountTime]);
+
   // Rotate through a window of GRADIENT_CYCLE_LENGTH gradients starting at
   // startIdx. Outer modulo wraps around the full GRADIENTS array so we don't
   // read past the end.
@@ -340,7 +380,9 @@ export default function SoundtrackPage() {
                 exit="exit"
                 className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)]"
               >
-                {selectedTitle || titles[0] || 'Finding your title…'}
+                {capitalizeFirst(
+                  selectedTitle || titles[0] || 'Finding your title…'
+                )}
               </motion.h1>
             </AnimatePresence>
 
@@ -350,16 +392,50 @@ export default function SoundtrackPage() {
                   className="inline-flex items-center rounded-full border border-brass/50 bg-ink/25 backdrop-blur-sm px-4 py-1.5 font-serif italic text-sm text-brass/95 [text-shadow:0_2px_10px_rgba(0,0,0,0.55)]"
                   aria-label="chosen genre"
                 >
-                  {answers.q4.charAt(0).toUpperCase() + answers.q4.slice(1)}
+                  {capitalizeFirst(answers.q4)}
                 </span>
               </div>
             )}
           </motion.div>
 
+          {/* Loading indicator ABOVE the cover — sits between the genre pill
+              and the album cover while music is generating. Displays the
+              gentle "this can take a minute" nudge alongside a fake progress
+              percentage so users see numeric progression. Vanishes cleanly
+              once music is ready. */}
+          <AnimatePresence>
+            {musicLoading && (
+              <motion.div
+                key="loading-row"
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-8 pb-2"
+                aria-live="polite"
+              >
+                <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/65 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+                  this can take a minute or two — keep this tab open
+                </p>
+                <span
+                  aria-hidden
+                  className="text-paper/30 font-sans text-[10px] sm:text-[11px]"
+                >
+                  ·
+                </span>
+                <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-brass tabular-nums [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
+                  {progress}%
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Cover + play button — the album-cover moment */}
           <motion.div
             variants={itemVariants}
-            className="flex justify-center pt-12 pb-12"
+            className={`flex justify-center pb-12 ${
+              musicLoading ? 'pt-4' : 'pt-12'
+            }`}
           >
             <CoverWithPlayer
               coverUrl={coverUrl}
@@ -820,9 +896,9 @@ function LoadingPulse() {
         />
       </div>
 
-      <p className="font-sans text-[10px] sm:text-[11px] tracking-[0.25em] uppercase text-paper/60 leading-relaxed max-w-[260px] mx-auto pt-2 [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]">
-        this can take a minute or two — keep this tab open
-      </p>
+      {/* "This can take a minute" text used to live here, but overlaid on
+          the cover image awkwardly once the cover arrived. Moved out of
+          the LoadingPulse and above the cover box in the parent page. */}
     </div>
   );
 }
