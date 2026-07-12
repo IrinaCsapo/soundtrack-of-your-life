@@ -8,7 +8,6 @@ import {
   type Variants,
 } from 'framer-motion';
 import { SiteNav } from '@/components/SiteNav';
-import { AnimatedBlobs } from '@/components/AnimatedBlobs';
 import { GRADIENTS } from '@/lib/gradients';
 
 /** Deterministic gradient START index from the soundtrack slug — the reveal
@@ -31,6 +30,13 @@ const GRADIENT_CYCLE_LENGTH = 4;
 
 /** Ms between gradient crossfades. Slow enough to breathe, not distracting. */
 const GRADIENT_CYCLE_MS = 22_000;
+
+/** Feature flag for the "Keep it going" extension button. Turned OFF for now
+ *  while the UX gets more product thinking (single-vs-multi click, error
+ *  recovery, whether to preserve the original alongside the extended track).
+ *  Backend + component + polling are still wired up — flip this to true to
+ *  bring it back. */
+const KEEP_IT_GOING_ENABLED = false;
 
 /** Capitalise the first character of a string. Used to display track titles
  *  (stored lowercase in Cabinet voice) as sentence-case H1s. */
@@ -411,17 +417,7 @@ export default function SoundtrackPage() {
             style={{ backgroundImage: `url(${gradient})` }}
           />
         </AnimatePresence>
-
-        {/* Ondulating colour blobs — hot pink, orange-red, deep violet —
-            layered over Fabiana's gradient with plus-lighter blend so they
-            glow through like flames behind fabric. This is what makes the
-            page feel alive rather than static-with-slow-crossfade. */}
-        <AnimatedBlobs />
-
-        {/* Darkening gradient for text readability. Slightly softened
-            (was from-ink/70 → from-ink/55) so the blobs breathe through
-            more visibly at the top and bottom of the frame. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/25 to-ink/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/45 to-ink/85" />
       </div>
       <SiteNav />
       {hasFailed ? (
@@ -574,9 +570,12 @@ export default function SoundtrackPage() {
           {/* "Keep it going" moment — a distinct pill above the standard
               actions row. Appears only once the user has actually pressed
               play (earning the option rather than surfacing it upfront) and
-              hides once the track is at full 120s length. */}
+              hides once the track is at full 60s length.
+              Feature-flagged OFF via KEEP_IT_GOING_ENABLED — the backend,
+              polling, and component are all still wired up. Flip the flag
+              to true when the UX is ready to ship. */}
           <AnimatePresence>
-            {hasPlayed && musicReady && (
+            {KEEP_IT_GOING_ENABLED && hasPlayed && musicReady && (
               <motion.div
                 key="keep-going-row"
                 initial={{ opacity: 0, y: 8 }}
