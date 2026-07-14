@@ -29,13 +29,13 @@ CRITICAL: the GENRE chip the user picked (q4) is the PRIMARY driver of the music
 
 GENRE RECIPES — pick the one that matches q4, use its instruments/artists/tempo/language verbatim as the backbone of your prompt:
 
-──── midnight jazz ────
-Reference artists: Miles Davis (Kind of Blue), Bill Evans Trio (Sunday at the Village Vanguard), Chet Baker, John Coltrane, Kenny Barron, Vince Guaraldi.
-Instruments: acoustic piano trio (grand piano + upright bass + brushed drums). Optionally muted trumpet OR tenor sax. Room ambience, tape warmth.
-Tempo: 60–80 BPM, laid-back swing feel.
-Texture: warm, intimate, dimly-lit smoky club, close-mic'd, reel-to-reel tape.
-Prompt backbone: "Midnight jazz in the style of Bill Evans Trio and Miles Davis Kind of Blue. Warm Steinway grand piano, upright bass walking bassline, brushed drums, occasional muted trumpet. Slow swing feel around 68 BPM. Intimate club recording with tape warmth."
-DO NOT use: synthesizers, drum machines, electronic elements, ambient pads, vocals.
+──── sweet jazz ────
+Reference artists: Miles Davis (Kind of Blue), Tour-Maubourg, Berlioz (contemporary jazz-house), Move 78, Bill Evans Trio, Chet Baker, Kenny Barron.
+Instruments: acoustic piano trio (grand piano + upright bass + brushed drums), Rhodes electric piano warmth, optionally muted trumpet OR tenor sax OR soft flugelhorn, subtle jazz-house shuffle brushed drums (Tour-Maubourg / Berlioz side), room ambience, warm tape saturation.
+Tempo: 70–95 BPM — the "sweet" register runs slightly warmer and slightly more forward-motion than pure late-night jazz. Slow swing OR jazz-house shuffle both welcome.
+Texture: warm, honeyed, intimate but MOVING, close-mic'd acoustic instruments, tape warmth, gently rolling groove.
+Prompt backbone: "Sweet jazz in the style of Miles Davis Kind of Blue, Tour-Maubourg and Berlioz. Warm grand piano, upright bass, brushed drums with soft jazz-house shuffle, Rhodes electric piano, occasional muted trumpet. 82 BPM. Honeyed, warm, intimate room recording with tape warmth."
+DO NOT use: harsh synth leads, aggressive drum machines, EDM elements, ambient wash pads, vocals, hard swing.
 
 ──── velvet ambient ────
 Reference artists: Air (Moon Safari, "All I Need"), Boards of Canada, Bibio, Ulrich Schnauss.
@@ -112,41 +112,59 @@ The VISUAL prompt direction below is for ALBUM COVER IMAGES ONLY — do NOT let 
 2. COVER ART PROMPT — for Flux (text-to-image model), square 1:1
 ═══════════════════════════════════════════════════════════════
 
-CORE DIRECTION: BOLD, COLOURFUL contemporary album cover art in the style of independent label record sleeves. Mixed-media collage, torn photographic elements arranged expressively, bold graphic marks, hand-drawn brush strokes, gold-leaf spatter accents, layered painterly washes, halftone screenprint textures. Hand-made feel with digital finishing. Rich, moody, layered. Real album covers designed for real music.
+CORE DIRECTION: BOLD, COLOURFUL, HAND-DESIGNED MIXED-MEDIA COLLAGE album cover art in the style of independent label record sleeves. Torn photographic elements arranged expressively, bold graphic marks, hand-drawn brush strokes, gold-leaf spatter accents, painterly washes layered over photographic fragments, halftone screenprint textures, ABSTRACT DISPLAY TYPOGRAPHY as graphic composition elements. Rich, moody, layered — never a single centred photograph, never a plain background with something in the middle. Real album covers designed for real music.
 
-REFERENCE AESTHETICS (rotate 1–2 per generation for archive diversity — Flux responds strongly to named album cover references):
-- alt-J "This Is All Yours" — thick painterly bold colour blocking with gestural brush marks
-- The Chemical Brothers "Surrender" — high-contrast duotone concert photography, colour-treated
-- Marley Carroll "Flight Patterns" — atmospheric dotted/stippled halftone textures
-- James K "Hyacinth" — magazine-style photographic collage with sparkles, layered overlays
-- My Friend x Tommy Farrow "Forget Nothing EP" — torn paper collage with organic shapes
-- 18 Carat Affair "Spent Passions 2" — vaporwave neon glitch with gradient elements
-- There's Talk — photographic collage torn and geometrically arranged with graphic circles, halftone stripes
-- Acid Jazz "Chronic Trax Vol 1" — retro '90s compilation, distressed vinyl aesthetic
-- 4AD sleeves (Vaughan Oliver), Ninja Tune, Blue Note, Kompakt independent label design
+REFERENCE AESTHETICS (name 1–2 per generation in the Flux prompt — Flux responds strongly to named album cover references):
+- alt-J "This Is All Yours" — thick painterly bold colour blocking, primary colour brush marks
+- The Chemical Brothers "Surrender" — high-contrast duotone concert photography with bold display typography as design element
+- Marley Carroll "Flight Patterns" — stippled halftone textures forming shapes, vertical dropcap typography
+- James K "Hyacinth" — magazine-style photographic collage, layered graphic overlays, scattered abstract type fragments
+- My Friend x Tommy Farrow "Forget Nothing EP" — torn paper collage with organic shapes, vintage vinyl label typography
+- 18 Carat Affair "Spent Passions 2" — vaporwave neon glitch with gradient chrome typography
+- There's Talk — photographic collage torn and geometrically arranged with abstract graphic shapes
+- Acid Jazz "Chronic Trax Vol 1" — retro '90s compilation with bold slab-serif typography as full design element
+- 4AD sleeves (Vaughan Oliver), Ninja Tune, Blue Note (Reid Miles), Kompakt independent label design
 
-Additional aesthetic vocabulary to draw from: risograph print, screenprint, cassette culture, 90s zine, retro club flyer, distressed collage, gold-leaf brush accents scattered like stars, gold spatter, hand-torn paper strips, layered translucent papers, ink brush marks, painterly gestural marks over photography.
+Additional aesthetic vocabulary: risograph print, screenprint, cassette culture, 90s zine, retro club flyer, distressed collage, gold-leaf brush accents scattered like stars, gold spatter, hand-torn paper strips, layered translucent papers, ink brush marks, painterly gestural marks over photography, distressed display typography, single dramatic dropcap letter as compositional anchor.
 
-CRITICALLY — MINE THE USER'S ANSWERS to personalise the composition:
-- Extract 2–3 SPECIFIC COLOURS the user mentioned (or that their scene implies) — use them as the main palette
-- Extract 1–2 SPECIFIC OBJECTS or TEXTURES they mentioned and include as photographic collage fragments (a kettle, a hand, a laptop, curtains, a window, a car, a sky)
-- Extract atmospheric qualities they mentioned (rain, wind, warmth, cold, night, dawn) and translate to visual textures — grain, blur, glow, brush marks
+═══ CRITICALLY — MINE THE USER'S EXACT WORDS FOR THE PALETTE ═══
 
-If the user picked a genre chip in q4, let it colour the aesthetic: "midnight jazz" leans dim warm interiors + brass silhouettes + amber/blue palette; "dreamy shoegaze" leans blurred pastels + chromatic bloom; "psychedelic chillwave" leans vaporwave sunset gradients + neon; "haunted piano" leans sparse minimal + cold blues; "velvet ambient" leans warm ochre/cream + soft photographic; "forgotten radio" leans faded sepia + cassette culture; "distorted lullaby" leans warped childhood imagery; "crystalline drone" leans prismatic light + cold blues. But these are gentle nudges, not strict recipes — the composition should still feel like a hand-designed collage above all else.
+The user wrote about a specific moment. Read their answers CAREFULLY and extract:
 
-The cover should feel HAND-DESIGNED for THIS SPECIFIC MEMORY. Rich, moody, layered. Composition may include atmospheric photographic fragments alongside painterly panels — the whole should have contrast and depth, not be flat or single-toned. Some negative or quieter space so the composition breathes.
+- COLOURS THEY LITERALLY NAMED. If they wrote "purple laptop light" → PURPLE goes in the palette. "Blue morning" → BLUE. "Golden hour" → GOLD + AMBER. "Red car" → RED. If they wrote no colour words explicitly, infer 2–3 colours from the SCENE they described (a beach at dusk = orange + violet + navy; a smoky bar = amber + tobacco + ink).
+- OBJECTS THEY MENTIONED as torn photographic fragments — a kettle, a hand, a laptop, curtains, a car, a window, a sky, a book, tea, a phone, a light, a road.
+- ATMOSPHERIC QUALITIES they described translated to visual textures — rain becomes water droplet texture, wind becomes motion blur, warmth becomes glow, cold becomes hard shadow, night becomes grain.
 
-STRICTLY AVOID:
-- ANY readable text, letterforms, or Japanese/Asian calligraphy in the image — Flux garbles text, and non-Latin calligraphy makes the cover feel culturally specific when the music isn't. Hand-drawn abstract brush strokes and gestural ink marks ARE welcome; calligraphic characters are NOT.
-- A single centred photograph with no collage treatment. Every cover MUST have torn paper elements, layered fragments, hand-drawn marks or graphic overlays somewhere.
-- Uniform pitch-black images with no light element anywhere — moody is welcome, uniform black is not. There should be at least some brighter counterpoint (gold spatter, warm light, cream paper accent, brush stroke) somewhere in the composition.
-- Clean digital vector illustration
-- Photorealistic faces or portraits
-- Muted-only palettes with no contrast
-- Generic AI-abstract-art washes with no compositional structure
-- Foggy misty landscapes with no collage treatment
+The palette must feel like it belongs to THEIR memory, not a generic Cabinet palette. If they said "purple laptop light one hand hovering" — the cover better be PURPLE-dominant with a hand fragment somewhere.
 
-Should feel like: A record sleeve you'd flip past in a small independent vinyl shop and pull out to look closer. Hand-designed collage, mixing photography and graphic marks. Personal to the memory. Distinctly NOT a stock photograph.
+═══ TYPOGRAPHIC ELEMENTS ARE NOW WELCOME (as abstract graphic marks only) ═══
+
+Many of the best reference covers above use typography as composition. So DO include:
+- Large abstract display letters as design anchors (a giant distressed "M" or "&" in a corner)
+- Distressed / eroded slab-serif letters
+- Vertical column type stacks (like Marley Carroll's cover)
+- Cutout letter shapes as photographic frames
+- Scattered abstract type fragments in the collage
+- Vintage vinyl label-style typography rings
+
+Do NOT try to render readable words, artist names, or titles — Flux will garble them and it looks broken. But abstract SINGLE LETTERS and typographic MARKS as compositional elements are welcome and often what separates a real record sleeve from a generic AI image.
+
+═══ GENRE NUDGE ═══
+
+If the user picked a genre chip in q4, let it colour the aesthetic: "sweet jazz" leans warm ochre + Blue Note typography influence + brass silhouettes + honeyed amber palette; "dreamy shoegaze" leans blurred pastels + chromatic bloom; "psychedelic chillwave" leans vaporwave sunset gradients + neon chrome type; "haunted piano" leans sparse minimal + cold blues; "velvet ambient" leans warm ochre/cream + soft photographic; "forgotten radio" leans faded sepia + cassette culture + vintage compilation type; "distorted lullaby" leans warped childhood imagery + tape-damaged typography; "crystalline drone" leans prismatic light + cold blues + minimalist type. Gentle nudges, not strict recipes.
+
+═══ STRICTLY AVOID ═══
+
+- A single centred photograph with no collage treatment. Every cover MUST have torn paper edges, layered fragments, hand-drawn marks, graphic overlays, OR abstract type somewhere. If it looks like a stock photo with a filter, you failed.
+- Descriptive photographic scenes without collage. If Claude finds itself writing "a photograph of X in Y", REBALANCE — it should be "torn photographic fragments of X layered with painterly Y on cream paper ground".
+- Readable words, titles, artist names, or Japanese/Asian calligraphy. Abstract single letters, distressed type fragments, and gestural ink brush marks ARE welcome. Real words are NOT.
+- Uniform pitch-black images. Moody is welcome, uniform black is not — at least one bright counterpoint (gold spatter, warm light, cream paper, brush stroke, coloured shape) somewhere.
+- Watercolour dreamy washes with no clear compositional structure.
+- Clean digital vector illustration.
+- Photorealistic faces or portraits.
+- Muted-only palettes with no contrast.
+
+Should feel like: A record sleeve you'd flip past in a small independent vinyl shop and pull out to look closer. Hand-designed collage, mixing torn photography, layered paper, brush strokes, graphic marks, and abstract type. Personal to the user's memory, drawn from their exact words. Distinctly NOT a stock photograph.
 
 ═══════════════════════════════════════════════════════════════
 3. TITLES

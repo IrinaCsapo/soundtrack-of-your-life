@@ -1,6 +1,27 @@
 import type { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 
+/** AP-style title case for the link-preview title. */
+const TITLE_CASE_SMALL_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'nor',
+  'of', 'off', 'on', 'or', 'per', 'so', 'the', 'to', 'up', 'via', 'yet',
+]);
+
+function toTitleCase(s: string): string {
+  if (!s) return s;
+  const words = s.trim().split(/\s+/);
+  return words
+    .map((word, i) => {
+      const lower = word.toLowerCase();
+      const isFirstOrLast = i === 0 || i === words.length - 1;
+      if (!isFirstOrLast && TITLE_CASE_SMALL_WORDS.has(lower)) {
+        return lower;
+      }
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
+}
+
 /**
  * Server-side metadata for the soundtrack reveal page. The page itself is a
  * client component ('use client'), which can't export `generateMetadata` —
@@ -39,9 +60,9 @@ export async function generateMetadata({
       (Array.isArray(data.titles) && data.titles[0]) ||
       'a soundtrack';
 
-    // Titles are stored lowercase in the Cabinet voice; capitalise for
-    // link-preview presentation.
-    const title = rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
+    // Titles are stored lowercase in the Cabinet voice; render title-case
+    // for link-preview presentation.
+    const title = toTitleCase(rawTitle);
 
     // Description: the user's Q1 answer (the "where and when") makes a
     // lovely evocative teaser under the OG image. Fallback stays generic.

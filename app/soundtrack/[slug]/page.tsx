@@ -38,11 +38,35 @@ const GRADIENT_CYCLE_MS = 22_000;
  *  bring it back. */
 const KEEP_IT_GOING_ENABLED = false;
 
-/** Capitalise the first character of a string. Used to display track titles
- *  (stored lowercase in Cabinet voice) as sentence-case H1s. */
+/** Capitalise the first character of a string. Used for the genre pill. */
 function capitalizeFirst(s: string): string {
   if (!s) return s;
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** AP-style title case for track titles. Capitalises all major words,
+ *  keeps articles/short prepositions/conjunctions lowercase — unless they
+ *  fall in the first or last position, where the standard is to always
+ *  capitalise. Titles are stored lowercase in the Cabinet voice
+ *  ("the forest can wait") and displayed title-case ("The Forest Can Wait"). */
+const TITLE_CASE_SMALL_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'nor',
+  'of', 'off', 'on', 'or', 'per', 'so', 'the', 'to', 'up', 'via', 'yet',
+]);
+
+function toTitleCase(s: string): string {
+  if (!s) return s;
+  const words = s.trim().split(/\s+/);
+  return words
+    .map((word, i) => {
+      const lower = word.toLowerCase();
+      const isFirstOrLast = i === 0 || i === words.length - 1;
+      if (!isFirstOrLast && TITLE_CASE_SMALL_WORDS.has(lower)) {
+        return lower;
+      }
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
 }
 
 /** Fake progress ramp so the user sees numeric progression while music is
@@ -462,7 +486,7 @@ export default function SoundtrackPage() {
                 exit="exit"
                 className="font-display wonk text-4xl sm:text-5xl text-paper italic leading-tight [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)]"
               >
-                {capitalizeFirst(
+                {toTitleCase(
                   selectedTitle || titles[0] || 'Finding your title…'
                 )}
               </motion.h1>

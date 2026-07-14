@@ -35,9 +35,9 @@ async function getPublicSoundtracks(): Promise<ArchiveItem[]> {
       (Array.isArray(s.titles) && s.titles.length > 0
         ? s.titles[0]
         : 'untitled');
-    // Titles are stored lowercase in the Cabinet voice; capitalise the
-    // first letter for card display so they read as proper titles.
-    const title = rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
+    // Titles are stored lowercase in the Cabinet voice; display them in
+    // AP-style title case ("The Forest Can Wait") for card display.
+    const title = toTitleCaseForArchive(rawTitle);
     return {
       id: s.id,
       title,
@@ -45,6 +45,28 @@ async function getPublicSoundtracks(): Promise<ArchiveItem[]> {
       genre: answers.q4 || null,
     };
   });
+}
+
+// AP-style title case — capitalise major words, keep small words lowercase
+// unless they're first or last in the title.
+const TITLE_CASE_SMALL_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'nor',
+  'of', 'off', 'on', 'or', 'per', 'so', 'the', 'to', 'up', 'via', 'yet',
+]);
+
+function toTitleCaseForArchive(s: string): string {
+  if (!s) return s;
+  const words = s.trim().split(/\s+/);
+  return words
+    .map((word, i) => {
+      const lower = word.toLowerCase();
+      const isFirstOrLast = i === 0 || i === words.length - 1;
+      if (!isFirstOrLast && TITLE_CASE_SMALL_WORDS.has(lower)) {
+        return lower;
+      }
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
 }
 
 export default async function ArchivePage() {

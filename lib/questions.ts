@@ -21,7 +21,7 @@ export const GENRE_OPTIONS = [
   'psychedelic chillwave',
   'haunted piano',
   'velvet ambient',
-  'midnight jazz',
+  'sweet jazz',
   'forgotten radio',
   'crystalline drone',
 ];
