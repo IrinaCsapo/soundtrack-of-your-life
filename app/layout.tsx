@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Crimson_Pro, Fraunces, Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 
 // Body italic — Crimson Pro (existing)
@@ -78,6 +79,14 @@ export default function RootLayout({
     >
       <body className="bg-ink text-paper font-serif antialiased min-h-screen">
         {children}
+        {/* Umami analytics — Next.js's <Script> handles the defer + head
+            placement properly with strategy="afterInteractive". */}
+        <Script
+          defer
+          src="https://irina-umami.vercel.app/script.js"
+          data-website-id="64bb36d9-4527-4e54-9f12-158daa4ae926"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
