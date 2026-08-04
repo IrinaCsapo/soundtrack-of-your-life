@@ -60,12 +60,12 @@ Texture: hazy, sunlit, VHS-warm.
 Prompt backbone: "Psychedelic chillwave in the style of Washed Out Feel It All Around and Toro y Moi. Sun-bleached warm synths with chorus, laid-back drum machine groove, warm bass, dreamy chorused guitar. 95 BPM. Hazy nostalgic warmth."
 
 ──── haunted piano ────
-Reference artists: Nils Frahm (Solo, Felt), Ólafur Arnalds, Chilly Gonzales (Solo Piano), Erik Satie (Gymnopédies), Max Richter.
-Instruments: SOLO acoustic piano ONLY. Prominent pedal creaks, hammer sounds, room ambience.
+Reference artists: Nils Frahm (Solo, Felt), Ólafur Arnalds, Chilly Gonzales (Solo Piano), Erik Satie (Gymnopédies), Max Richter, Julianna Barwick (wordless vocal side), Grouper (Ruins).
+Instruments: acoustic piano leading (prominent pedal creaks, hammer sounds), plus distant WORDLESS FEMALE HUMMING — breathy vocal texture, NO words, sitting like mist behind the piano. Room ambience.
 Tempo: rubato, expressive, no fixed tempo.
-Texture: intimate, close-mic'd single instrument, empty-room reverb.
-Prompt backbone: "Haunted solo acoustic piano in the style of Nils Frahm Solo and Erik Satie Gymnopédies. Sparse melancholic piano melody with prominent pedal creaks and hammer noise. Empty room ambience, close-mic'd. Free rubato tempo. Solo piano only, no other instruments."
-DO NOT use: ANY other instruments, ANY drum machines, ANY synthesizers.
+Texture: intimate, close-mic'd piano with a soft breathy vocal presence in the room — like someone humming to themselves in the next room while the piano plays.
+Prompt backbone: "Haunted acoustic piano in the style of Nils Frahm Solo and Erik Satie Gymnopédies, with distant wordless female humming à la Julianna Barwick — breathy vocal texture, no lyrics, sitting behind the piano like mist. Sparse melancholic piano melody with prominent pedal creaks and hammer noise. Empty room ambience, close-mic'd. Free rubato tempo."
+DO NOT use: drum machines, synthesizers, actual sung lyrics, aggressive electronics. The vocal is ALWAYS wordless and breathy — never words.
 
 ──── forgotten radio ────
 Reference artists: Boards of Canada (Music Has The Right To Children), William Basinski (Disintegration Loops melodic side), The Caretaker, Broadcast, Aphex Twin (Selected Ambient Volume II melodic pieces).
