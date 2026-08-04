@@ -82,11 +82,12 @@ Texture: warped, unsettled-tender, tape warp.
 Prompt backbone: "Distorted lullaby in the style of Grouper Ruins and Aphex Twin Selected Ambient Volume II. Warped music-box melody, wordless ethereal vocal-like pad, detuned piano fragments, tape wobble. 65 BPM. Eerie yet comforting, dreamlike."
 
 ──── crystalline drone ────
-Reference artists: Ryuichi Sakamoto (async), Steve Reich (Music for 18 Musicians), Nils Frahm (All Melody minimalism), Emeralds, Kaitlyn Aurelia Smith.
-Instruments: bowed metal, glass harmonica, sustained crystal pads, minimal repetitive motifs, sine-wave textures.
-Tempo: free time OR slow 60 BPM pulse.
-Texture: prismatic, shimmering, minimalist.
-Prompt backbone: "Crystalline drone minimalism in the style of Ryuichi Sakamoto async and Steve Reich Music for 18 Musicians. Bowed metal, glass harmonica, sustained crystal pads, minimal repetitive motifs. Free time. Prismatic, luminous, cold-beautiful."
+Reference artists: Nils Frahm (Says, All Melody, Solo), Max Richter (On the Nature of Daylight, Sleep, The Blue Notebooks), Ólafur Arnalds (re:member, Sunrise Session), Ryuichi Sakamoto (Merry Christmas Mr Lawrence, async piano pieces), Alva Noto x Sakamoto (Insen).
+Instruments: solo grand piano leading, warm STRING QUARTET underneath (cello prominent, viola, two violins), sustained warm pads (Yamaha CP70 or Rhodes for shimmer), gentle glass-bell resonance as texture only, minimal repetitive melodic motifs.
+Tempo: 55–70 BPM, gentle steady pulse or slow rubato — NOT free-time chaos.
+Texture: warm NEOCLASSICAL MINIMALISM — prismatic AND melodic, shimmering but always anchored on piano and strings. Beautiful, palatable, quietly emotional.
+Prompt backbone: "Neoclassical minimalism in the style of Nils Frahm All Melody and Max Richter On the Nature of Daylight. Solo grand piano leading, warm string quartet with prominent cello, sustained warm pad, gentle glass resonance as texture. 62 BPM steady pulse. Prismatic, melodic, luminous, quietly emotional."
+DO NOT use: harsh synth drones, experimental noise, sine wave textures, bowed metal, glass harmonica as a lead instrument, aggressive electronics, free-time chaos, dissonance.
 
 ──── custom text in q4 (user typed their own) ────
 Take their words verbatim as the genre, add 1–2 style-adjacent reference artists based on their term. Follow the same structure — genre + artists + instruments + tempo + texture.

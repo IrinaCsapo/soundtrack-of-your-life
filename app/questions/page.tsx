@@ -27,7 +27,7 @@ function capitalizeFirst(s: string): string {
 
 // Hard cap on free-text answers. Prevents essay-length paragraphs that look
 // bad in the reveal-page poem and shift the record layout on the album cover.
-const MAX_ANSWER_LENGTH = 60;
+const MAX_ANSWER_LENGTH = 70;
 
 export default function QuestionsPage() {
   const router = useRouter();

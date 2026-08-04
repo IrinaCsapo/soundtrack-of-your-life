@@ -397,6 +397,13 @@ export default function SoundtrackPage() {
         >
           <source src="/bg_gradient_5_web.mp4" type="video/mp4" />
         </video>
+        {/* Flat 25% ink overlay — knocks down the bright pink phases of
+            the video loop so the title + poem stay readable regardless of
+            what colour the video happens to be hitting at any moment. */}
+        <div className="absolute inset-0 bg-ink/25" />
+        {/* Top/bottom vignette gradient — layered on top of the flat
+            darkener, preserves the natural attention curve (dark at the
+            edges, slightly lighter behind the cover). */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/45 to-ink/85" />
       </div>
       <SiteNav />
