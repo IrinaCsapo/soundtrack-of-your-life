@@ -358,20 +358,6 @@ export default function SoundtrackPage() {
   const hasFailed =
     status === 'failed' || status === 'canceled' || (error && !audioUrl);
 
-  // Living background — same soundtrack always starts on the same gradient
-  // (deterministic from the slug so the OG image / initial paint is stable),
-  // then slowly cycles through a curated sequence every ~22 seconds. Combined
-  // with the ken-burns drift below, the page feels like it's breathing.
-  const startIdx = useMemo(() => gradientStartIndexForSlug(id), [id]);
-  const [cycleOffset, setCycleOffset] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCycleOffset((n) => n + 1);
-    }, GRADIENT_CYCLE_MS);
-    return () => clearInterval(interval);
-  }, []);
-
   // Fake progress % while music is generating. Ramps from 5→90 over ~100s,
   // holds at 90 until the real music succeeds, then jumps to 100.
   const [mountTime] = useState(() => Date.now());
@@ -395,52 +381,22 @@ export default function SoundtrackPage() {
     return () => clearInterval(interval);
   }, [musicLoading, musicReady, mountTime]);
 
-  // Rotate through a window of GRADIENT_CYCLE_LENGTH gradients starting at
-  // startIdx. Outer modulo wraps around the full GRADIENTS array so we don't
-  // read past the end.
-  const gradient =
-    GRADIENTS[
-      (startIdx + (cycleOffset % GRADIENT_CYCLE_LENGTH)) % GRADIENTS.length
-    ];
-  const nextGradientKey = `${id}-${cycleOffset}`;
-
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20 relative overflow-hidden">
-      {/* Living background — a slow crossfade between gradients plus a
-          subtle ken-burns drift (scale + translate) so the page never feels
-          static behind the record. Base ink layer is always present so we
-          never see a bare white flash between crossfades. */}
+      {/* Video background — silent looping gradient loop from /public.
+          Base ink layer sits underneath so we never see a bare white flash
+          on first paint before the video decodes. */}
       <div className="fixed inset-0 pointer-events-none bg-ink" aria-hidden>
-        <AnimatePresence mode="sync">
-          <motion.div
-            key={nextGradientKey}
-            initial={{ opacity: 0, scale: 1.06 }}
-            animate={{
-              opacity: 0.5,
-              scale: [1.06, 1.14, 1.06],
-              x: [0, 18, 0],
-              y: [0, -12, 0],
-            }}
-            exit={{ opacity: 0 }}
-            transition={{
-              opacity: { duration: 4, ease: 'easeInOut' },
-              scale: {
-                duration: GRADIENT_CYCLE_MS / 1000,
-                ease: 'easeInOut',
-              },
-              x: {
-                duration: GRADIENT_CYCLE_MS / 1000,
-                ease: 'easeInOut',
-              },
-              y: {
-                duration: GRADIENT_CYCLE_MS / 1000,
-                ease: 'easeInOut',
-              },
-            }}
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${gradient})` }}
-          />
-        </AnimatePresence>
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/bg_gradient_5_web.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/45 to-ink/85" />
       </div>
       <SiteNav />

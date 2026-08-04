@@ -147,6 +147,31 @@ export default function QuestionsPage() {
             style={{ backgroundImage: `url(${gradient})` }}
           />
         </AnimatePresence>
+
+        {/* Video background — fades in during the submitting state and
+            carries visually into the reveal page (which uses the same
+            video), so the transition from "make it" tap → new page feels
+            like one continuous moment rather than a page swap. */}
+        <AnimatePresence>
+          {submitting && (
+            <motion.video
+              key="submit-video-bg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, ease: 'easeInOut' }}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src="/bg_gradient_5_web.mp4" type="video/mp4" />
+            </motion.video>
+          )}
+        </AnimatePresence>
+
         {/* Vignette + dark overlay so question text always reads */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/35 to-ink/70" />
       </div>
