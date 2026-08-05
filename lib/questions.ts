@@ -1,4 +1,4 @@
-export type QuestionType = 'text' | 'genre' | 'mood';
+export type QuestionType = 'text' | 'genre';
 
 export type Question = {
   id: string;
@@ -24,21 +24,6 @@ export const GENRE_OPTIONS = [
   'sweet jazz',
   'forgotten radio',
   'crystalline drone',
-];
-
-/**
- * Mood chips for Q5 — used to inform the emotional register of the music.
- * NOT displayed back to the user on the reveal page; only used internally.
- */
-export const MOOD_OPTIONS = [
-  'Excited',
-  'Hopeful',
-  'Calm',
-  'Tender',
-  'Melancholic',
-  'Sad',
-  'Restless',
-  'Reflective',
 ];
 
 export const questions: Question[] = [
@@ -69,13 +54,5 @@ export const questions: Question[] = [
     skippable: true,
     type: 'genre',
     options: GENRE_OPTIONS,
-  },
-  {
-    id: 'q5',
-    text: "What's your mood right now?",
-    placeholder: 'Or describe how you feel…',
-    skippable: true,
-    type: 'mood',
-    options: MOOD_OPTIONS,
   },
 ];

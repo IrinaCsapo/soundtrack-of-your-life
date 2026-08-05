@@ -95,15 +95,7 @@ Take their words verbatim as the genre, add 1–2 style-adjacent reference artis
 ──── q4 skipped entirely ────
 Default to the "velvet ambient" recipe above.
 
-MOOD MODIFIERS (from q5) — these FINE-TUNE the recipe, they do NOT override the genre:
-- Excited → uptempo end of the genre's BPM range, brighter major keys, more movement
-- Hopeful → warm major keys, sunrise energy, uplifting resolution
-- Calm → slower end of BPM range, more space between notes
-- Tender → soft dynamics, closer mic, intimate register
-- Melancholic → minor keys, slower end of BPM
-- Sad → sparser arrangement, more silence
-- Restless → unresolved harmonies, subtle tension
-- Reflective → mid-tempo, contemplative, spacious
+The emotional register of the music should be inferred from Q1–Q3 (the user's own words about the moment). If they wrote about hitting send on an important email, lean brighter/hopeful. If they wrote about a lost afternoon, lean melancholic. Read the memory and match the emotional weight.
 
 STRICTLY AVOID across all genres: vocals/lyrics, generic lo-fi hip-hop beats, elevator music, meditation-app music, harsh experimental noise, aggressive EDM/dance drops, cinematic Hollywood scoring.
 
@@ -207,10 +199,7 @@ function formatUserPrompt(answers: Answers): string {
     `Q3 — what the moment whispers: ${answers.q3 || '(skipped)'}`,
     answers.q4
       ? `Genre they want (q4): ${answers.q4}`
-      : 'Genre: not specified (use lo-fi ambient default)',
-    answers.q5
-      ? `Their current mood (q5 — use this to inform emotional register of the music): ${answers.q5}`
-      : 'Mood: not specified',
+      : 'Genre: not specified (use velvet ambient default)',
   ].join('\n');
 }
 
