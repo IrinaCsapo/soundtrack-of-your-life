@@ -167,7 +167,7 @@ export default function QuestionsPage() {
               preload="auto"
               className="absolute inset-0 w-full h-full object-cover"
             >
-              <source src="/bg_gradient_4_web.mp4" type="video/mp4" />
+              <source src="/dark%20gradients%20Irina1-web.mp4" type="video/mp4" />
             </motion.video>
           )}
         </AnimatePresence>
