@@ -58,10 +58,7 @@ export default function QuestionsPage() {
 
   useEffect(() => {
     // Only auto-focus textarea for free-text questions, not chip selectors
-    if (
-      currentQuestion.type !== 'genre' &&
-      currentQuestion.type !== 'mood'
-    ) {
+    if (currentQuestion.type !== 'genre') {
       const t = setTimeout(() => textareaRef.current?.focus(), 50);
       return () => clearTimeout(t);
     }
@@ -225,8 +222,7 @@ export default function QuestionsPage() {
             >
               <h1
                 className={`font-display text-3xl md:text-4xl italic text-paper leading-snug [text-shadow:0_2px_24px_rgba(0,0,0,0.55),0_0_40px_rgba(0,0,0,0.35)] ${
-                  currentQuestion.type === 'genre' ||
-                  currentQuestion.type === 'mood'
+                  currentQuestion.type === 'genre'
                     ? 'text-center'
                     : 'text-left'
                 }`}
@@ -234,8 +230,7 @@ export default function QuestionsPage() {
                 {currentQuestion.text}
               </h1>
 
-              {currentQuestion.type === 'genre' ||
-              currentQuestion.type === 'mood' ? (
+              {currentQuestion.type === 'genre' ? (
                 <GenreSelector
                   value={currentAnswer}
                   onChange={update}
