@@ -356,47 +356,32 @@ export default function QuestionsPage() {
 }
 
 // ---------------------------------------------------------------------------
-// Genre selector with chips + custom field
+// Genre selector — chips only. The "or write your own" custom text field
+// was removed because it invited off-brand inputs (users typing things that
+// didn't map to any recipe in the Claude prompt) and cluttered the flow.
+// The 8 curated chips are the whole story now.
 // ---------------------------------------------------------------------------
 
 function GenreSelector({
   value,
   onChange,
   options,
-  placeholder,
 }: {
   value: string;
   onChange: (v: string) => void;
   options: string[];
-  placeholder: string;
+  placeholder?: string;
 }) {
-  const isCustom = value.length > 0 && !options.includes(value);
-  const [customText, setCustomText] = useState(isCustom ? value : '');
-
-  useEffect(() => {
-    if (isCustom) setCustomText(value);
-  }, [isCustom, value]);
-
-  function pickChip(opt: string) {
-    onChange(opt);
-    setCustomText('');
-  }
-
-  function typeCustom(text: string) {
-    setCustomText(text);
-    onChange(text);
-  }
-
   return (
-    <div className="space-y-8 pt-2">
+    <div className="pt-2">
       <div className="flex flex-wrap gap-2 justify-center">
         {options.map((opt) => {
-          const selected = value === opt && !isCustom;
+          const selected = value === opt;
           return (
             <button
               key={opt}
               type="button"
-              onClick={() => pickChip(opt)}
+              onClick={() => onChange(opt)}
               className={`px-4 py-2 rounded-full border text-sm font-serif italic backdrop-blur-sm transition-colors duration-300 ${
                 selected
                   ? 'border-brass text-brass bg-brass/10'
@@ -407,35 +392,6 @@ function GenreSelector({
             </button>
           );
         })}
-      </div>
-
-      <div className="flex flex-col items-center gap-3 pt-2">
-        <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-paper/65">
-          or write your own
-        </p>
-        <div className="w-full max-w-sm space-y-1">
-          <input
-            type="text"
-            value={customText}
-            onChange={(e) => typeCustom(capitalizeFirst(e.target.value))}
-            placeholder={placeholder}
-            aria-label="custom genre"
-            maxLength={MAX_ANSWER_LENGTH}
-            className="w-full text-center bg-transparent border-b border-paper/30 focus:border-brass text-paper font-serif italic placeholder:text-paper/45 placeholder:italic py-2 outline-none transition-colors duration-300"
-          />
-          <p
-            className={`text-right font-sans text-[10px] tracking-[0.2em] uppercase transition-colors duration-300 ${
-              customText.length >= MAX_ANSWER_LENGTH
-                ? 'text-brass'
-                : customText.length >= 45
-                  ? 'text-paper/70'
-                  : 'text-paper/35'
-            }`}
-            aria-live="polite"
-          >
-            {customText.length} / {MAX_ANSWER_LENGTH}
-          </p>
-        </div>
       </div>
     </div>
   );
