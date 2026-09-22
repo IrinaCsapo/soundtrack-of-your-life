@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { SiteNav } from '@/components/SiteNav';
 import { supabaseAdmin } from '@/lib/supabase';
 import { GRADIENTS } from '@/lib/gradients';
+import { CabinetPlayerView, type Track } from '@/components/CabinetPlayerView';
 
 // Revalidate the archive every minute so new shares appear without a deploy
 export const revalidate = 60;
@@ -10,17 +10,10 @@ export const metadata = {
   title: 'The Soundtrack Cabinet',
 };
 
-type ArchiveItem = {
-  id: string;
-  title: string;
-  coverUrl: string | null;
-  genre: string | null;
-};
-
-async function getPublicSoundtracks(): Promise<ArchiveItem[]> {
+async function getPublicSoundtracks(): Promise<Track[]> {
   const { data, error } = await supabaseAdmin
     .from('soundtracks')
-    .select('id, selected_title, titles, cover_url, shared_at, answers')
+    .select('id, selected_title, titles, cover_url, music_url, shared_at, answers')
     .eq('is_public', true)
     .not('music_url', 'is', null)
     .order('shared_at', { ascending: false })
@@ -35,14 +28,18 @@ async function getPublicSoundtracks(): Promise<ArchiveItem[]> {
       (Array.isArray(s.titles) && s.titles.length > 0
         ? s.titles[0]
         : 'untitled');
-    // Titles are stored lowercase in the Cabinet voice; display them in
-    // AP-style title case ("The Forest Can Wait") for card display.
+    // Titles are stored lowercase in Cabinet voice; display AP-style title case.
     const title = toTitleCaseForArchive(rawTitle);
+    // Poem excerpt = Q1 (the "where and when" scene line). It's the most
+    // evocative single line for a list-view card.
+    const poemExcerpt = answers.q1?.trim() || null;
     return {
       id: s.id,
       title,
       coverUrl: s.cover_url,
+      musicUrl: s.music_url,
       genre: answers.q4 || null,
+      poemExcerpt,
     };
   });
 }
@@ -70,7 +67,7 @@ function toTitleCaseForArchive(s: string): string {
 }
 
 export default async function ArchivePage() {
-  const soundtracks = await getPublicSoundtracks();
+  const tracks = await getPublicSoundtracks();
   // Picked at render time — changes ~every 60s when the page revalidates
   const gradient = GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
 
@@ -89,7 +86,7 @@ export default async function ArchivePage() {
 
       <div className="relative z-10 max-w-5xl mx-auto pt-12 sm:pt-16">
         {/* Header */}
-        <div className="text-center space-y-3 mb-16">
+        <div className="text-center space-y-3 mb-12">
           <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-paper/70 [text-shadow:0_2px_18px_rgba(0,0,0,0.6)]">
             the
           </p>
@@ -102,85 +99,8 @@ export default async function ArchivePage() {
           </p>
         </div>
 
-        {/* Grid */}
-        {soundtracks.length === 0 ? (
-          <div className="text-center pt-10 space-y-6">
-            <p className="font-serif italic text-paper/75 [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
-              No shared soundtracks yet.
-            </p>
-            <Link
-              href="/questions"
-              className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
-            >
-              make the first
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 sm:gap-8">
-            {soundtracks.map((s) => (
-              <Link key={s.id} href={`/soundtrack/${s.id}`} className="group">
-                <div className="aspect-square bg-warmth rounded-sm overflow-hidden mb-3 shadow-[0_4px_20px_rgba(0,0,0,0.35)]">
-                  {s.coverUrl ? (
-                    <img
-                      src={s.coverUrl}
-                      alt={s.title}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-warmth via-ink to-warmth" />
-                  )}
-                </div>
-                <div className="space-y-1">
-                  <p className="font-serif italic text-paper text-base leading-tight group-hover:text-brass transition-colors duration-300 [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
-                    {s.title}
-                  </p>
-                  {s.genre && (
-                    <p className="font-sans text-[9px] tracking-[0.25em] uppercase text-brass/85 group-hover:text-brass transition-colors duration-300 [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]">
-                      {s.genre}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* Bottom CTA */}
-        <div className="mt-24 text-center space-y-10">
-          <Link
-            href="/questions"
-            className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-8 py-3 rounded-full backdrop-blur-sm bg-ink/30"
-          >
-            make your own
-          </Link>
-          <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-paper/65 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-            <span>
-              made by{' '}
-              <a
-                href="https://irina.love"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
-              >
-                irina.love
-              </a>
-            </span>
-            <span className="text-paper/30" aria-hidden>
-              ·
-            </span>
-            <span>
-              gradients by{' '}
-              <a
-                href="https://fabianafiesmann.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
-              >
-                fabiana fiesmann
-              </a>
-            </span>
-          </p>
-        </div>
+        {/* List + player */}
+        <CabinetPlayerView tracks={tracks} />
       </div>
     </main>
   );
