@@ -64,8 +64,38 @@ export default function QuestionsPage() {
     }
   }, [step, currentQuestion.type]);
 
+  // Hydrate from sessionStorage on mount. The reveal page's "Make Another"
+  // button writes {q1, q2, q3} here so users can re-run their memory
+  // through a different genre chip without retyping their answers. Runs
+  // once on mount, clears the key after reading so a fresh visit later
+  // doesn't accidentally hydrate again.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = sessionStorage.getItem('prefilledAnswers');
+      if (!stored) return;
+      const prefilled = JSON.parse(stored) as Record<string, string>;
+      if (prefilled && typeof prefilled === 'object') {
+        setAnswers(prefilled);
+        // Jump to the last question (Q4, genre picker) — that's the whole
+        // point of the pre-fill: they've already done the memory work.
+        setStep(questions.length - 1);
+      }
+      sessionStorage.removeItem('prefilledAnswers');
+    } catch {
+      // malformed sessionStorage — ignore, fall back to fresh flow
+    }
+  }, []);
+
   function update(value: string) {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
+  }
+
+  // "Start from the beginning" — wipes all state and jumps back to Q1.
+  // Only exposed on the final step so it's an escape hatch, not a footgun.
+  function restart() {
+    setAnswers({});
+    setStep(0);
   }
 
   function back() {
@@ -310,6 +340,22 @@ export default function QuestionsPage() {
               You can skip this one
             </p>
           )}
+
+          {/* "Start from the beginning" — escape hatch on the last step so
+              a user who came here via "Make Another" (or one who changed
+              their mind mid-flow) can wipe everything and go back to Q1.
+              Sits below the back/make-it row as a small subtle link. */}
+          {isLast && (
+            <div className="text-center pt-4">
+              <button
+                type="button"
+                onClick={restart}
+                className="font-sans text-[10px] tracking-[0.3em] uppercase text-paper/50 hover:text-brass transition-colors duration-300 underline-offset-4 hover:underline"
+              >
+                start from the beginning
+              </button>
+            </div>
+          )}
         </div>
         )}
       </div>
@@ -360,7 +406,48 @@ export default function QuestionsPage() {
 // was removed because it invited off-brand inputs (users typing things that
 // didn't map to any recipe in the Claude prompt) and cluttered the flow.
 // The 8 curated chips are the whole story now.
+//
+// When a chip is picked, a small in-voice affirmation fades in below —
+// alternating between two messages per genre so a curious user pressing
+// the same chip twice doesn't see the exact same line twice in a row.
 // ---------------------------------------------------------------------------
+
+/** Two-message rotation per genre chip. Cabinet voice — warm, a little
+ *  playful, pun-adjacent where it lands. Keep them short (one line). */
+const GENRE_MESSAGES: Record<string, [string, string]> = {
+  'distorted lullaby': [
+    'Sweet dreams. Mostly.',
+    'Cradle songs with a little crack in them.',
+  ],
+  'dreamy shoegaze': [
+    'Eyes down, heart up.',
+    'Walls of sound, coming right up.',
+  ],
+  'psychedelic chillwave': [
+    'The good kind of drift.',
+    'Prepare to melt, gently.',
+  ],
+  'haunted piano': [
+    'A grand selection.',
+    'The piano remembers everything.',
+  ],
+  'velvet ambient': [
+    'Wrapped in something warm.',
+    'The softest room in the Cabinet.',
+  ],
+  'sweet jazz': [
+    'Sweet like Miles.',
+    'The honey and the piano.',
+  ],
+  'forgotten radio': [
+    'Tuning in to something half-remembered.',
+    'An old station, kept warm for you.',
+  ],
+  'crystalline drone': [
+    'The strings will do their thing.',
+    'Prepare to be gently levitated.',
+  ],
+};
 
 function GenreSelector({
   value,
@@ -372,8 +459,24 @@ function GenreSelector({
   options: string[];
   placeholder?: string;
 }) {
+  // Increments on every chip click. Modulo 2 picks message A or B — a
+  // consecutive re-tap on the same chip flips to the other message, and
+  // switching chips also flips, so back-to-back "sweet jazz" clicks never
+  // show the same line twice in a row.
+  const [messageCounter, setMessageCounter] = useState(0);
+
+  function pickChip(opt: string) {
+    onChange(opt);
+    setMessageCounter((n) => n + 1);
+  }
+
+  const activeMessages = value ? GENRE_MESSAGES[value] : undefined;
+  const activeMessage = activeMessages
+    ? activeMessages[messageCounter % 2]
+    : null;
+
   return (
-    <div className="pt-2">
+    <div className="pt-2 space-y-4">
       <div className="flex flex-wrap gap-2 justify-center">
         {options.map((opt) => {
           const selected = value === opt;
@@ -381,7 +484,7 @@ function GenreSelector({
             <button
               key={opt}
               type="button"
-              onClick={() => onChange(opt)}
+              onClick={() => pickChip(opt)}
               className={`px-4 py-2 rounded-full border text-sm font-serif italic backdrop-blur-sm transition-colors duration-300 ${
                 selected
                   ? 'border-brass text-brass bg-brass/10'
@@ -392,6 +495,28 @@ function GenreSelector({
             </button>
           );
         })}
+      </div>
+
+      {/* Small in-voice message that appears when a chip is picked.
+          `min-h-[1.75rem]` reserves the vertical space so the row below
+          (BACK / MAKE IT buttons) doesn't jump when the message fades in. */}
+      <div className="min-h-[1.75rem] flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          {activeMessage && (
+            <motion.p
+              // Key includes both the chip AND the counter so the animation
+              // re-fires when the same chip is clicked twice (different msg).
+              key={`${value}-${messageCounter}`}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="text-center font-serif italic text-brass/90 text-sm [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]"
+            >
+              {activeMessage}
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

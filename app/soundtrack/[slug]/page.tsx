@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   AnimatePresence,
   motion,
@@ -148,6 +148,7 @@ const titleSwapVariants: Variants = {
 
 export default function SoundtrackPage() {
   const params = useParams<{ slug: string }>();
+  const router = useRouter();
   const id = params.slug;
 
   const [status, setStatus] = useState<Status>('starting');
@@ -312,6 +313,30 @@ export default function SoundtrackPage() {
       setExtensionStatus('failed');
     }
   }, [extending, musicDuration, id]);
+
+  /** "Make Another" — the typical iteration loop is on the SOUND, not the
+   *  memory. Preserve Q1–Q3 (their moment) in sessionStorage and drop the
+   *  user straight onto Q4 (genre picker) so they can pick a different
+   *  sonic register for the same memory. If they want to truly start over,
+   *  Q4 exposes a "start from the beginning" link that wipes state. */
+  function handleMakeAnother() {
+    if (answers) {
+      try {
+        sessionStorage.setItem(
+          'prefilledAnswers',
+          JSON.stringify({
+            q1: answers.q1 ?? '',
+            q2: answers.q2 ?? '',
+            q3: answers.q3 ?? '',
+          })
+        );
+      } catch {
+        // sessionStorage can throw in private windows — non-fatal, we just
+        // end up with a fresh flow.
+      }
+    }
+    router.push('/questions');
+  }
 
   async function downloadAudio() {
     if (!audioUrl || downloading) return;
@@ -615,12 +640,12 @@ export default function SoundtrackPage() {
             >
               {copied ? 'copied' : 'copy link'}
             </button>
-            <a
-              href="/questions"
+            <button
+              onClick={handleMakeAnother}
               className="inline-flex items-center justify-center whitespace-nowrap font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-7 py-3 rounded-full backdrop-blur-sm bg-ink/30"
             >
               make another
-            </a>
+            </button>
           </motion.div>
         </motion.div>
       )}
