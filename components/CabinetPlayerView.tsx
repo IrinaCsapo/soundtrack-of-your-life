@@ -35,6 +35,9 @@ function shuffleArr<T>(arr: T[]): T[] {
  *  it through, but for now this constant keeps the UI honest. */
 const TRACK_DURATION_LABEL = '0:30';
 
+const INITIAL_VISIBLE = 20;
+const LOAD_MORE_STEP = 20;
+
 export function CabinetPlayerView({ tracks }: { tracks: Track[] }) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -46,6 +49,13 @@ export function CabinetPlayerView({ tracks }: { tracks: Track[] }) {
   const [playing, setPlaying] = useState(false);
   const [shuffling, setShuffling] = useState(false);
   const [progress, setProgress] = useState(0); // 0-1
+
+  // Pagination — show 20 tracks initially, reveal more on click. The full
+  // `tracks` array still feeds the shuffle queue + auto-advance, so
+  // playback traverses everything regardless of what's visible.
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  const visibleTracks = tracks.slice(0, visibleCount);
+  const hasMore = visibleCount < tracks.length;
 
   // Rebuild the queue whenever shuffle is toggled. Preserves the currently-
   // playing track's position — so flipping shuffle mid-song doesn't restart
@@ -204,9 +214,11 @@ export function CabinetPlayerView({ tracks }: { tracks: Track[] }) {
         </button>
       </div>
 
-      {/* Track list — scrolls with the page, no separate scroller */}
-      <ul className="pb-40">
-        {tracks.map((track, i) => (
+      {/* Track list — scrolls with the page, no separate scroller.
+          Only the visible slice is rendered, but the FULL tracks array
+          still drives shuffle + auto-advance behind the scenes. */}
+      <ul>
+        {visibleTracks.map((track, i) => (
           <TrackRow
             key={track.id}
             track={track}
@@ -224,8 +236,29 @@ export function CabinetPlayerView({ tracks }: { tracks: Track[] }) {
         ))}
       </ul>
 
+      {/* "View more" — reveals the next 20 tracks. Hidden once we've
+          shown everything. The count updates live so the header total
+          still reads the full library, not the visible slice. */}
+      {hasMore && (
+        <div className="pt-6 pb-4 text-center">
+          <button
+            onClick={() =>
+              setVisibleCount((n) =>
+                Math.min(n + LOAD_MORE_STEP, tracks.length)
+              )
+            }
+            className="inline-flex items-center gap-2 font-sans text-[10px] sm:text-[11px] tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-6 py-2.5 rounded-full backdrop-blur-sm bg-ink/25"
+          >
+            view more
+            <span className="text-paper/40">
+              {visibleCount} / {tracks.length}
+            </span>
+          </button>
+        </div>
+      )}
+
       {/* Bottom CTA — sits above the player bar so it doesn't get covered */}
-      <div className="text-center pt-4 pb-16 space-y-8">
+      <div className="text-center pt-8 pb-40 space-y-8">
         <Link
           href="/questions"
           className="inline-flex items-center justify-center font-sans text-[11px] sm:text-xs tracking-[0.3em] uppercase text-paper border border-paper/45 hover:border-brass hover:text-brass transition-colors duration-300 px-8 py-3 rounded-full backdrop-blur-sm bg-ink/30"
@@ -383,7 +416,6 @@ export function CabinetPlayerView({ tracks }: { tracks: Track[] }) {
 
 function TrackRow({
   track,
-  index,
   isCurrent,
   isPlaying,
   onPlay,
@@ -398,34 +430,37 @@ function TrackRow({
     <li>
       <button
         onClick={onPlay}
-        className={`group w-full grid grid-cols-[2rem_2.75rem_1fr_auto] sm:grid-cols-[2rem_2.75rem_1fr_1fr_auto] items-center gap-3 sm:gap-4 px-2 sm:px-4 py-2.5 rounded transition-colors duration-200 text-left ${
+        className={`group w-full grid grid-cols-[2.5rem_4rem_1fr_auto] sm:grid-cols-[2.5rem_4rem_1fr_1fr_auto] items-center gap-3 sm:gap-5 px-2 sm:px-4 py-3 rounded transition-colors duration-200 text-left ${
           isCurrent
             ? 'bg-brass/10'
             : 'hover:bg-paper/5'
         }`}
       >
-        {/* # / play indicator */}
+        {/* Play indicator — arrow icon by default, animated bars when
+            the row is currently playing (default state), pause icon on
+            hover of a playing row so tapping is obviously "stop this". */}
         <span
-          className={`font-sans text-[11px] tracking-[0.15em] tabular-nums text-center ${
-            isCurrent ? 'text-brass' : 'text-paper/50'
-          }`}
+          className={`flex items-center justify-center h-6 ${
+            isCurrent ? 'text-brass' : 'text-paper/70 group-hover:text-brass'
+          } transition-colors`}
         >
           {isPlaying ? (
-            <PlayingIndicator />
-          ) : (
             <>
               <span className="group-hover:hidden">
-                {String(index + 1).padStart(2, '0')}
+                <PlayingIndicator />
               </span>
-              <span className="hidden group-hover:inline text-brass">
-                <PlayGlyph className="w-3 h-3 inline" />
+              <span className="hidden group-hover:inline">
+                <PauseGlyph className="w-5 h-5" />
               </span>
             </>
+          ) : (
+            <PlayGlyph className="w-5 h-5" />
           )}
         </span>
 
-        {/* Cover thumbnail */}
-        <div className="w-11 h-11 rounded-sm overflow-hidden bg-warmth shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
+        {/* Cover thumbnail — bumped from 44px to 64px so the artwork
+            actually reads at list-view scale. */}
+        <div className="w-16 h-16 rounded-sm overflow-hidden bg-warmth shadow-[0_2px_10px_rgba(0,0,0,0.4)]">
           {track.coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
