@@ -753,16 +753,20 @@ function CoverWithPlayer({
       }
     }
     function onEnded() {
-      // Sequential playback — hop to the next segment if there is one,
-      // otherwise stop and pin progress to 100%.
+      // Continuous loop. If there's a next segment (extension), hop to it;
+      // otherwise loop back to segment 0 so the track plays forever until
+      // the user hits pause. This handler only fires when the audio's
+      // `loop` attribute is FALSE — for single-segment tracks the browser
+      // handles looping natively via `loop={true}` and this never runs.
       if (currentSegment + 1 < musicUrls.length) {
         setCurrentSegment(currentSegment + 1);
         setSegmentTime(0);
         // The [currentSegment, currentUrl] effect below will load + play
         // the next URL now that state has advanced.
-      } else {
-        setPlaying(false);
-        setSegmentTime(assumedSegmentSeconds);
+      } else if (musicUrls.length > 1) {
+        // Multi-segment loop — jump back to the start of the full track.
+        setCurrentSegment(0);
+        setSegmentTime(0);
       }
     }
     audio.addEventListener('timeupdate', onTime);
@@ -897,10 +901,20 @@ function CoverWithPlayer({
 
   return (
     <div className="relative w-72 h-72 sm:w-80 sm:h-80">
-      {/* Audio element — only src'd once we have at least one URL. Sequential
-          playback swaps this element's src to the next URL on `ended`. */}
+      {/* Audio element — only src'd once we have at least one URL.
+          For a single-segment track, we use the browser's native `loop`
+          attribute so the audio restarts seamlessly with zero gap between
+          plays. For multi-segment tracks (extensions), we can't use `loop`
+          because we need the `ended` event to advance to the next segment
+          — the onEnded handler above wraps back to segment 0 for that
+          case instead. */}
       {currentUrl && (
-        <audio ref={audioRef} src={currentUrl} preload="auto" />
+        <audio
+          ref={audioRef}
+          src={currentUrl}
+          preload="auto"
+          loop={musicUrls.length <= 1}
+        />
       )}
 
       {/* Cover image */}
