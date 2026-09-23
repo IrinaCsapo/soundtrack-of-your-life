@@ -430,7 +430,7 @@ function TrackRow({
     <li>
       <button
         onClick={onPlay}
-        className={`group w-full grid grid-cols-[2.5rem_4rem_1fr_auto] sm:grid-cols-[2.5rem_4rem_1fr_1fr_auto] items-center gap-3 sm:gap-5 px-2 sm:px-4 py-3 rounded transition-colors duration-200 text-left ${
+        className={`group w-full grid grid-cols-[3rem_12rem_1fr_auto] sm:grid-cols-[3rem_12rem_1fr_1fr_auto] items-center gap-4 sm:gap-6 px-2 sm:px-4 py-5 rounded-md transition-colors duration-200 text-left ${
           isCurrent
             ? 'bg-brass/10'
             : 'hover:bg-paper/5'
@@ -440,27 +440,28 @@ function TrackRow({
             the row is currently playing (default state), pause icon on
             hover of a playing row so tapping is obviously "stop this". */}
         <span
-          className={`flex items-center justify-center h-6 ${
+          className={`flex items-center justify-center h-8 ${
             isCurrent ? 'text-brass' : 'text-paper/70 group-hover:text-brass'
           } transition-colors`}
         >
           {isPlaying ? (
             <>
               <span className="group-hover:hidden">
-                <PlayingIndicator />
+                <PlayingIndicator large />
               </span>
               <span className="hidden group-hover:inline">
-                <PauseGlyph className="w-5 h-5" />
+                <PauseGlyph className="w-7 h-7" />
               </span>
             </>
           ) : (
-            <PlayGlyph className="w-5 h-5" />
+            <PlayGlyph className="w-7 h-7" />
           )}
         </span>
 
-        {/* Cover thumbnail — bumped from 44px to 64px so the artwork
-            actually reads at list-view scale. */}
-        <div className="w-16 h-16 rounded-sm overflow-hidden bg-warmth shadow-[0_2px_10px_rgba(0,0,0,0.4)]">
+        {/* Cover thumbnail — 192px, roughly triple the earlier 64px so the
+            art is properly visible. This turns the list into a stacked
+            gallery of large record covers rather than a compact table. */}
+        <div className="w-48 h-48 rounded-sm overflow-hidden bg-warmth shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
           {track.coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -473,24 +474,25 @@ function TrackRow({
           )}
         </div>
 
-        {/* Title + genre */}
+        {/* Title + genre — bumped up a size to balance the bigger art. */}
         <div className="min-w-0">
           <p
-            className={`font-serif italic text-sm sm:text-base leading-tight truncate ${
+            className={`font-serif italic text-lg sm:text-xl leading-tight truncate ${
               isCurrent ? 'text-brass' : 'text-paper group-hover:text-brass'
             } transition-colors [text-shadow:0_2px_18px_rgba(0,0,0,0.5)]`}
           >
             {track.title}
           </p>
           {track.genre && (
-            <p className="font-sans text-[9px] tracking-[0.25em] uppercase text-brass/70 mt-0.5 truncate">
+            <p className="font-sans text-[10px] tracking-[0.28em] uppercase text-brass/80 mt-1.5 truncate">
               {track.genre}
             </p>
           )}
         </div>
 
-        {/* Poem excerpt — hidden on mobile */}
-        <p className="hidden sm:block font-serif italic text-paper/55 text-sm leading-tight truncate">
+        {/* Poem excerpt — hidden on mobile, slightly bigger on desktop
+            to hold its weight next to the larger artwork. */}
+        <p className="hidden sm:block font-serif italic text-paper/60 text-base leading-snug line-clamp-3">
           {track.poemExcerpt ?? ''}
         </p>
 
@@ -581,18 +583,24 @@ function ShuffleGlyph({ className }: { className?: string }) {
   );
 }
 
-// Small animated "playing now" indicator — three tiny bars pulsing at
-// different rates. Sits in place of the row number when a track is playing.
-function PlayingIndicator() {
+// Animated "playing now" indicator — three bars pulsing at staggered rates.
+// Sits in place of the play arrow while a track is playing. `large` prop
+// scales it up to match the bigger row (used in the list); no prop = small
+// (for anywhere else we ever use it).
+function PlayingIndicator({ large = false }: { large?: boolean }) {
+  const sizeClasses = large
+    ? 'h-6 gap-[3px]'
+    : 'h-3 gap-[2px]';
+  const barWidth = large ? 'w-[3px]' : 'w-[2px]';
   return (
-    <span className="inline-flex items-end gap-[2px] h-3 text-brass">
+    <span className={`inline-flex items-end text-brass ${sizeClasses}`}>
       <motion.span
-        className="w-[2px] bg-current rounded-full"
+        className={`${barWidth} bg-current rounded-full`}
         animate={{ height: ['30%', '90%', '30%'] }}
         transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.span
-        className="w-[2px] bg-current rounded-full"
+        className={`${barWidth} bg-current rounded-full`}
         animate={{ height: ['80%', '35%', '80%'] }}
         transition={{
           duration: 0.9,
@@ -602,7 +610,7 @@ function PlayingIndicator() {
         }}
       />
       <motion.span
-        className="w-[2px] bg-current rounded-full"
+        className={`${barWidth} bg-current rounded-full`}
         animate={{ height: ['45%', '95%', '45%'] }}
         transition={{
           duration: 0.9,
